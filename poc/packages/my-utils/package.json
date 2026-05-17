@@ -1,0 +1,32 @@
+{
+  "name": "@poc/my-utils",
+  "version": "0.1.0",
+  "description": "Utility functions — install or copy-paste",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./string-utils": {
+      "import": "./dist/string-utils.js",
+      "types": "./dist/string-utils.d.ts"
+    },
+    "./format-utils": {
+      "import": "./dist/format-utils.js",
+      "types": "./dist/format-utils.d.ts"
+    },
+    "./math-utils": {
+      "import": "./dist/math-utils.js",
+      "types": "./dist/math-utils.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc"
+  }
+}

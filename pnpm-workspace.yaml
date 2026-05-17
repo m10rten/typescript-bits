@@ -1,0 +1,11 @@
+packages:
+  - "poc/*"
+  - "poc/packages/*"
+allowBuilds:
+  esbuild: set this to true or false
+saveExact: true
+ignoreScripts: true
+engineStrict: true
+packageManagerStrict: true
+minimumReleaseAge: 10080
+minimumReleaseAgeStrict: true

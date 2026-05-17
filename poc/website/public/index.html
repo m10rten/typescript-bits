@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@poc/my-utils — Install or Copy-Paste</title>
+    <style>
+      :root {
+        --bg: #0d1117;
+        --surface: #161b22;
+        --border: #30363d;
+        --text: #c9d1d9;
+        --text-muted: #8b949e;
+        --accent: #58a6ff;
+        --green: #3fb950;
+        --orange: #d29922;
+        --code-bg: #0d1117;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        padding: 2rem 1rem;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+      }
+      h2 {
+        font-size: 1.3rem;
+        margin: 2rem 0 1rem;
+        color: var(--accent);
+      }
+
+      .subtitle {
+        color: var(--text-muted);
+        margin-bottom: 2rem;
+      }
+
+      .choice-cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.2rem;
+      }
+
+      .card h3 {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+      }
+      .card p {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 0.8rem;
+      }
+
+      .card code {
+        display: block;
+        background: var(--code-bg);
+        padding: 0.6rem 0.8rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        overflow-x: auto;
+      }
+
+      .file-section {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        overflow: hidden;
+      }
+
+      .file-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1rem;
+        background: rgba(255, 255, 255, 0.03);
+        border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
+      }
+
+      .file-name {
+        font-family: "SFMono-Regular", Consolas, monospace;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+
+      .badge {
+        font-size: 0.7rem;
+        background: var(--accent);
+        color: var(--bg);
+        padding: 0.1rem 0.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+      }
+
+      .deps {
+        font-size: 0.75rem;
+        color: var(--orange);
+      }
+
+      .header-actions {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .install-hint {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        font-family: "SFMono-Regular", Consolas, monospace;
+      }
+
+      .copy-btn {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-muted);
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.75rem;
+        transition: all 0.15s;
+      }
+
+      .copy-btn:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .copy-btn.copied {
+        border-color: var(--green);
+        color: var(--green);
+      }
+
+      .code-wrapper {
+        padding: 1rem;
+        overflow-x: auto;
+      }
+
+      pre {
+        margin: 0;
+      }
+
+      code {
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        font-size: 0.82rem;
+        line-height: 1.5;
+        color: var(--text);
+      }
+
+      .source-note {
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+      }
+
+      @media (max-width: 700px) {
+        .choice-cards {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>@poc/my-utils</h1>
+      <p class="subtitle">
+        Utility functions with a single source of truth. Three ways to use — pick what fits your workflow.
+      </p>
+
+      <h2>Three ways to use</h2>
+      <div class="choice-cards">
+        <div class="card">
+          <h3>📦 Package</h3>
+          <p>Full npm package with types and updates.</p>
+          <code>npm install @poc/my-utils</code>
+        </div>
+        <div class="card">
+          <h3>🔧 CLI install</h3>
+          <p>Resolves dependencies, writes .ts files to your project. No npm.</p>
+          <code>pnpm install-utils format-utils</code>
+        </div>
+        <div class="card">
+          <h3>📋 Copy-paste</h3>
+          <p>Zero dependencies. Manual copy for simple cases.</p>
+          <code
+            >import { ... } from &quot;@poc/my-utils/format-utils&quot;; import { ... } from
+            &quot;@poc/my-utils/math-utils&quot;; import { ... } from &quot;@poc/my-utils/string-utils&quot;;</code
+          >
+        </div>
+      </div>
+
+      <h2>Source Files</h2>
+      <p class="subtitle" style="margin-bottom: 1rem">
+        These are the exact source files — the single source of truth. Files with dependencies show a
+        <span style="color: var(--orange)">deps</span> hint and a CLI install command.
+      </p>
+
+      <section class="file-section">
+        <div class="file-header">
+          <span class="file-name">index.ts</span>
+          <span class="badge">entry</span>
+          <span class="deps">deps: string-utils.ts, math-utils.ts, format-utils.ts</span>
+          <div class="header-actions">
+            <button class="copy-btn" data-target="code-index.ts" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+        <div class="code-wrapper">
+          <pre><code id="code-index.ts">export * from &quot;./string-utils.js&quot;;
+export * from &quot;./math-utils.js&quot;;
+export * from &quot;./format-utils.js&quot;;
+</code></pre>
+        </div>
+      </section>
+
+      <section class="file-section">
+        <div class="file-header">
+          <span class="file-name">format-utils.ts</span>
+
+          <span class="deps">deps: string-utils.ts, math-utils.ts</span>
+          <div class="header-actions">
+            <span class="install-hint">pnpm install-utils format-utils</span>
+            <button class="copy-btn" data-target="code-format-utils.ts" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+        <div class="code-wrapper">
+          <pre><code id="code-format-utils.ts">import { capitalize, toKebabCase } from &quot;./string-utils.js&quot;;
+import { clamp, mapRange } from &quot;./math-utils.js&quot;;
+
+/**
+ * Formats a numeric score into a human-readable label.
+ * 0-33 → &quot;Poor&quot;, 34-66 → &quot;Fair&quot;, 67-100 → &quot;Great&quot;
+ */
+export function formatScore(score: number): string {
+  const clamped = clamp(score, 0, 100);
+  const label =
+    clamped &lt;= 33 ? &quot;poor&quot; : clamped &lt;= 66 ? &quot;fair&quot; : &quot;great&quot;;
+  return capitalize(label);
+}
+
+/**
+ * Creates a progress bar string from a value.
+ * e.g. formatProgress(0.7, 20) → &quot;[██████████████░░░░░░] 70%&quot;
+ */
+export function formatProgress(value: number, width: number = 20): string {
+  const clamped = clamp(value, 0, 1);
+  const filled = Math.round(mapRange(clamped, 0, 1, 0, width));
+  const empty = width - filled;
+  const bar = &quot;█&quot;.repeat(filled) + &quot;░&quot;.repeat(empty);
+  const pct = Math.round(clamped * 100);
+  return `[${bar}] ${pct}%`;
+}
+
+/**
+ * Formats a module name into a display-ready title.
+ * e.g. &quot;string-utils&quot; → &quot;String Utils&quot;
+ */
+export function formatModuleName(name: string): string {
+  const kebab = toKebabCase(name);
+  return kebab
+    .split(&quot;-&quot;)
+    .map(capitalize)
+    .join(&quot; &quot;);
+}
+</code></pre>
+        </div>
+      </section>
+
+      <section class="file-section">
+        <div class="file-header">
+          <span class="file-name">math-utils.ts</span>
+
+          <div class="header-actions">
+            <span class="install-hint">pnpm install-utils math-utils</span>
+            <button class="copy-btn" data-target="code-math-utils.ts" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+        <div class="code-wrapper">
+          <pre><code id="code-math-utils.ts">/**
+ * Clamps a number between a minimum and maximum value.
+ */
+export function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max);
+}
+
+/**
+ * Linearly interpolates between two values.
+ */
+export function lerp(start: number, end: number, t: number): number {
+  return start + (end - start) * clamp(t, 0, 1);
+}
+
+/**
+ * Maps a value from one range to another.
+ */
+export function mapRange(
+  value: number,
+  inMin: number,
+  inMax: number,
+  outMin: number,
+  outMax: number,
+): number {
+  const t = (value - inMin) / (inMax - inMin);
+  return lerp(outMin, outMax, t);
+}
+</code></pre>
+        </div>
+      </section>
+
+      <section class="file-section">
+        <div class="file-header">
+          <span class="file-name">string-utils.ts</span>
+
+          <div class="header-actions">
+            <span class="install-hint">pnpm install-utils string-utils</span>
+            <button class="copy-btn" data-target="code-string-utils.ts" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+        <div class="code-wrapper">
+          <pre><code id="code-string-utils.ts">/**
+ * Capitalizes the first letter of a string.
+ */
+export function capitalize(str: string): string {
+  if (str.length === 0) return str;
+  return str[0].toUpperCase() + str.slice(1);
+}
+
+/**
+ * Converts a string to kebab-case.
+ * &quot;helloWorld&quot; → &quot;hello-world&quot;
+ */
+export function toKebabCase(str: string): string {
+  return str
+    .replace(/([a-z])([A-Z])/g, &quot;$1-$2&quot;)
+    .replace(/\s+/g, &quot;-&quot;)
+    .toLowerCase();
+}
+
+/**
+ * Truncates a string to a maximum length, adding an ellipsis if truncated.
+ */
+export function truncate(str: string, maxLength: number): string {
+  if (str.length &lt;= maxLength) return str;
+  return str.slice(0, maxLength - 3) + &quot;...&quot;;
+}
+</code></pre>
+        </div>
+      </section>
+
+      <p class="source-note">
+        Generated from <code>packages/my-utils/src/</code> — one source, three distribution methods.
+      </p>
+    </div>
+
+    <script>
+      async function copyCode(btn) {
+        const targetId = btn.getAttribute("data-target");
+        const code = document.getElementById(targetId).textContent;
+        await navigator.clipboard.writeText(code);
+        btn.textContent = "Copied!";
+        btn.classList.add("copied");
+        setTimeout(() => {
+          btn.textContent = "Copy";
+          btn.classList.remove("copied");
+        }, 2000);
+      }
+    </script>
+  </body>
+</html>
