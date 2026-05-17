@@ -1,6 +1,3 @@
-packages:
-  - "poc/*"
-  - "poc/packages/*"
 allowBuilds:
   esbuild: set this to true or false
 saveExact: true

@@ -1,0 +1,22 @@
+{
+  "name": "copy-install-poc",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "copy-install": "./dist/scripts/install.js"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "install-utils": "node dist/scripts/install.js",
+    "install-utils:dry": "node dist/scripts/install.js --dry-run",
+    "list": "node dist/scripts/install.js list"
+  },
+  "devDependencies": {
+    "@types/node": "^25.8.0"
+  }
+}
