@@ -29,19 +29,58 @@
   ],
   "zshy": {
     "exports": {
-      ".": "./src/index.ts",
+      "./atom": "./src/atom.ts",
+      "./reset/array": "./src/reset/array.ts",
+      "./reset/fetch": "./src/reset/fetch.ts",
+      "./reset/filter": "./src/reset/filter.ts",
+      "./reset/json": "./src/reset/json.ts",
+      "./reset/map": "./src/reset/map.ts",
+      "./reset/set": "./src/reset/set.ts",
+      "./reset": "./src/reset/index.ts",
       "./result": "./src/result.ts",
       "./safe": "./src/safe.ts"
     }
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.cts",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.cts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+    "./atom": {
+      "types": "./dist/atom.d.cts",
+      "import": "./dist/atom.js",
+      "require": "./dist/atom.cjs"
+    },
+    "./reset/array": {
+      "types": "./dist/reset/array.d.cts",
+      "import": "./dist/reset/array.js",
+      "require": "./dist/reset/array.cjs"
+    },
+    "./reset/fetch": {
+      "types": "./dist/reset/fetch.d.cts",
+      "import": "./dist/reset/fetch.js",
+      "require": "./dist/reset/fetch.cjs"
+    },
+    "./reset/filter": {
+      "types": "./dist/reset/filter.d.cts",
+      "import": "./dist/reset/filter.js",
+      "require": "./dist/reset/filter.cjs"
+    },
+    "./reset/json": {
+      "types": "./dist/reset/json.d.cts",
+      "import": "./dist/reset/json.js",
+      "require": "./dist/reset/json.cjs"
+    },
+    "./reset/map": {
+      "types": "./dist/reset/map.d.cts",
+      "import": "./dist/reset/map.js",
+      "require": "./dist/reset/map.cjs"
+    },
+    "./reset/set": {
+      "types": "./dist/reset/set.d.cts",
+      "import": "./dist/reset/set.js",
+      "require": "./dist/reset/set.cjs"
+    },
+    "./reset": {
+      "types": "./dist/reset/index.d.cts",
+      "import": "./dist/reset/index.js",
+      "require": "./dist/reset/index.cjs"
     },
     "./result": {
       "types": "./dist/result.d.cts",

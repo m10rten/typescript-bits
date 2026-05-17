@@ -1,2 +1,1 @@
-export * from "./result.js";
-export * from "./safe.js";
+import "./reset/index.js";
