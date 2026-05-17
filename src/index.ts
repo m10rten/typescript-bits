@@ -1,1 +1,2 @@
-console.log("hello world!");
+export * from "./result.js";
+export * from "./safe.js";

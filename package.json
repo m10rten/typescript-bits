@@ -1,7 +1,7 @@
 {
   "name": "typescript-bits",
   "version": "0.0.0",
-  "description": "",
+  "description": "A collection of TypeScript utility primitives for Node.js",
   "type": "module",
   "scripts": {
     "format": "prettier --write .",
@@ -9,7 +9,8 @@
     "prepare": "husky",
     "precommit": "pnpm format:check && pnpm typecheck",
     "typecheck": "tsc --noEmit",
-    "build": "zshy"
+    "build": "zshy",
+    "test": "tsx --test tests/*.test.ts"
   },
   "keywords": [],
   "author": "m10rten",
@@ -26,15 +27,31 @@
   "files": [
     "dist"
   ],
-  "zshy": "src/index.ts",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "zshy": {
+    "exports": {
+      ".": "./src/index.ts",
+      "./result": "./src/result.ts",
+      "./safe": "./src/safe.ts"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.cts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "types": "./dist/index.d.cts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./result": {
+      "types": "./dist/result.d.cts",
+      "import": "./dist/result.js",
+      "require": "./dist/result.cjs"
+    },
+    "./safe": {
+      "types": "./dist/safe.d.cts",
+      "import": "./dist/safe.js",
+      "require": "./dist/safe.cjs"
     }
   }
 }

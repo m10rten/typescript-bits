@@ -3,63 +3,37 @@
   "display": "Default",
   "compilerOptions": {
     // === Base / Module Settings ===
-    // JavaScript output target version
     "target": "esnext",
-    // Module system for generated JS
     "module": "nodenext",
-    // How TypeScript resolves module imports
     "moduleResolution": "nodenext",
-    // Ensures files can be safely transpiled by tools like Babel
     "isolatedModules": true,
-    // Enforces modern import/export syntax (type-only imports require `type` keyword)
     "verbatimModuleSyntax": true,
-    // Enables interoperability with CommonJS default exports
     "esModuleInterop": true,
 
     // === Output Settings ===
-    // Source root directory for compilation
-    "rootDir": "./src",
-    // Output directory for compiled JS files
     "outDir": "./dist",
-    // Generates .d.ts declaration files
     "declaration": true,
-    // Generates source maps for .d.ts files
     "declarationMap": true,
-    // Generates .map files for debugging
     "sourceMap": true,
-    // Embeds source files in the source map (false = separate .ts files)
     "inlineSources": false,
-    // Strips comments from output JS
     "removeComments": true,
-    // Prevents watch mode from clearing the console on rebuild
     "preserveWatchOutput": true,
 
     // === Strictness / Type Checking ===
-    // Enables all strict type checking options
     "strict": true,
-    // Requires explicit null/undefined handling (included in strict)
     "strictNullChecks": true,
-    // Disallows implicit `any` types (included in strict)
     "noImplicitAny": true,
-    // Requires handling undefined for indexed access (e.g., arr[0] could be undefined)
     "noUncheckedIndexedAccess": true,
-    // Errors on unused local variables
     "noUnusedLocals": true,
-    // Errors on unused function parameters
     "noUnusedParameters": true,
-    // Errors on unreachable code
     "allowUnreachableCode": false,
 
     // === Compatibility / Safety ===
-    // Prevents case-sensitivity issues across OS file systems
     "forceConsistentCasingInFileNames": true,
-    // Skips type checking of declaration files (speeds up compilation)
     "skipLibCheck": true,
-    // Enables project references for incremental builds (disabled here)
     "composite": false,
-    // Includes only specified global type definitions
     "types": ["node"]
   },
-  // Directories to exclude from compilation
+  "include": ["src/**/*.ts", "tests/**/*.ts"],
   "exclude": ["node_modules", "dist", "examples", "poc"]
 }
