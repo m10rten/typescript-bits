@@ -2,9 +2,14 @@
   "name": "typescript-bits",
   "version": "0.0.0",
   "description": "",
-  "main": "src/index.ts",
+  "type": "module",
   "scripts": {
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky",
+    "precommit": "pnpm format:check && pnpm typecheck",
+    "typecheck": "tsc --noEmit",
+    "build": "zshy"
   },
   "keywords": [],
   "author": "m10rten",
@@ -12,9 +17,24 @@
   "packageManager": "pnpm@11.1.2",
   "devDependencies": {
     "@types/node": "25.6.2",
-    "eslint": "10.3.0",
+    "husky": "9.1.7",
     "prettier": "3.8.3",
     "tsx": "4.21.0",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "zshy": "0.7.2"
+  },
+  "files": [
+    "dist"
+  ],
+  "zshy": "src/index.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
   }
 }
