@@ -35,8 +35,12 @@ export namespace Safe {
     }
   }
 
-  export function async<T, E = Error>(fn: () => Promise<T>, transform?: (error: unknown) => E): Promise<Result<T, E>> {
-    return wrapAsync(fn(), transform);
+  export function async<T, E = Error>(
+    fn: Promise<T> | (() => Promise<T>),
+    transform?: (error: unknown) => E,
+  ): Promise<Result<T, E>> {
+    const cb = typeof fn === "function" ? fn() : fn;
+    return wrapAsync(cb, transform);
   }
 }
 

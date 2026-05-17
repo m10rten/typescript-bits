@@ -30,6 +30,7 @@
   "zshy": {
     "exports": {
       "./atom": "./src/atom.ts",
+      "./json": "./src/json.ts",
       "./reset/array": "./src/reset/array.ts",
       "./reset/fetch": "./src/reset/fetch.ts",
       "./reset/filter": "./src/reset/filter.ts",
@@ -46,6 +47,11 @@
       "types": "./dist/atom.d.cts",
       "import": "./dist/atom.js",
       "require": "./dist/atom.cjs"
+    },
+    "./json": {
+      "types": "./dist/json.d.cts",
+      "import": "./dist/json.js",
+      "require": "./dist/json.cjs"
     },
     "./reset/array": {
       "types": "./dist/reset/array.d.cts",
