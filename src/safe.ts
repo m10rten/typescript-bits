@@ -1,5 +1,4 @@
-import type { Result } from "./result.js";
-import { Result as R } from "./result.js";
+import { Result } from "./result.js";
 
 export namespace Safe {
   export function attempt<T, E = Error>(promise: Promise<T>, transform?: (error: unknown) => E): Promise<Result<T, E>>;
@@ -22,17 +21,17 @@ export namespace Safe {
       if (result instanceof Promise) {
         return wrapAsync(result, transform);
       }
-      return R.ok(result);
+      return Result.ok(result);
     } catch (error) {
-      return R.err(transform ? transform(error) : (error as E));
+      return Result.err(transform ? transform(error) : (error as E));
     }
   }
 
   export function sync<T, E = Error>(fn: () => T, transform?: (error: unknown) => E): Result<T, E> {
     try {
-      return R.ok(fn());
+      return Result.ok(fn());
     } catch (error) {
-      return R.err(transform ? transform(error) : (error as E));
+      return Result.err(transform ? transform(error) : (error as E));
     }
   }
 
@@ -43,8 +42,8 @@ export namespace Safe {
 
 async function wrapAsync<T, E>(promise: Promise<T>, transform?: (error: unknown) => E): Promise<Result<T, E>> {
   try {
-    return R.ok(await promise);
+    return Result.ok(await promise);
   } catch (error) {
-    return R.err(transform ? transform(error) : (error as E));
+    return Result.err(transform ? transform(error) : (error as E));
   }
 }
