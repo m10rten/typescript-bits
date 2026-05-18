@@ -13,10 +13,12 @@ A collection of TypeScript utility primitives (Result, deferred, cache, queue, e
 
 ## Code Style
 
+- **Production first** — quality over quantity, always. Every piece of code must be production-ready before merging. No shortcuts, no "we'll fix it later".
 - **Strict TypeScript** — `strict: true`, `noUncheckedIndexedAccess`, `noUnusedLocals`, `noUnusedParameters`, `verbatimModuleSyntax`
 - **Prettier** — run `pnpm format` before committing; pre-commit hook enforces `pnpm format:check && pnpm typecheck`
 - **Node native** — prefer built-in Node APIs over third-party packages where possible
 - **JSDoc** — only for externally-exported code and complex logic; skip for trivial internal functions
+- **No barrel exports** — never use `export {}` or re-export modules through index files; import directly from source files
 - **Self-documenting code** — DRY, KISS, meaningful names over comments
 
 ---
