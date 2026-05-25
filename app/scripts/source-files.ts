@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, basename } from "node:path";
 import { createHighlighter, type Highlighter } from "shiki";
 
@@ -11,19 +11,25 @@ export interface ModuleExport {
   line: number;
 }
 
+export interface ModuleChild {
+  name: string;
+  description: string;
+}
+
 export interface ModuleMeta {
   name: string;
   source: string;
   imports: string[];
-  isReset: boolean;
   description: string;
   exports: ModuleExport[];
+  children?: ModuleChild[];
 }
 
 const descriptionFallback: Record<string, string> = {
   atom: "Reactive state atom with subscriptions",
   json: "Rich JSON serialization with extended type support",
   queue: "Event-driven queue with typed event system",
+  reset: "TypeScript built-in type resets (unknown over any)",
   result: "Type-safe Result type (Ok/Err)",
   retry: "Retry utility with configurable backoff strategies",
   safe: "Safe execution wrapper returning Results",
@@ -105,34 +111,58 @@ export function getModuleNames(): string[] {
     if (entry.isFile() && entry.name.endsWith(".ts") && entry.name !== "index.ts") {
       names.push(entry.name.replace(/\.ts$/, ""));
     }
-  }
-  const resetDir = join(SRC_DIR, "reset");
-  const resetEntries = readdirSync(resetDir, { withFileTypes: true });
-  for (const entry of resetEntries) {
-    if (entry.isFile() && entry.name.endsWith(".ts") && entry.name !== "index.ts") {
-      names.push(`reset.${entry.name.replace(/\.ts$/, "")}`);
+    // Directories with index.ts are modules too (skip cli/ and _ prefixed dirs)
+    if (entry.isDirectory() && entry.name !== "cli" && !entry.name.startsWith("_")) {
+      const indexPath = join(SRC_DIR, entry.name, "index.ts");
+      try {
+        if (readFileSync(indexPath, "utf-8")) names.push(entry.name);
+      } catch {
+        // no index.ts — not a module
+      }
     }
   }
   return names;
 }
 
+function scanChildren(modulePath: string): ModuleChild[] {
+  const dirPath = join(SRC_DIR, modulePath);
+  try {
+    return readdirSync(dirPath, { withFileTypes: true })
+      .filter(
+        (entry) =>
+          entry.isFile() && entry.name.endsWith(".ts") && entry.name !== "index.ts" && !entry.name.startsWith("_"),
+      )
+      .map((entry) => {
+        const name = entry.name.replace(/\.ts$/, "");
+        const childSource = readFileSync(join(dirPath, entry.name), "utf-8");
+        return { name, description: extractDescription(childSource, name) };
+      });
+  } catch {
+    return [];
+  }
+}
+
 export function getModuleContent(modulePath: string): ModuleMeta {
-  const isReset = modulePath.startsWith("reset.");
-  const filePath = isReset
-    ? join(SRC_DIR, "reset", `${modulePath.slice("reset.".length)}.ts`)
-    : join(SRC_DIR, `${modulePath}.ts`);
+  if (modulePath.startsWith("bin")) {
+    throw new Error(`"${modulePath}" is not a library module`);
+  }
+  // Try direct file first (atom.ts, result.ts), then directory/index.ts (reset/index.ts)
+  let filePath = join(SRC_DIR, `${modulePath}.ts`);
+  let isDir = false;
+  if (!existsSync(filePath)) {
+    filePath = join(SRC_DIR, modulePath, "index.ts");
+    isDir = true;
+  }
   const source = readFileSync(filePath, "utf-8");
   const imports = extractImports(source);
   const description = extractDescription(source, modulePath);
   const exports = extractExports(source);
-  return { name: modulePath, source, imports, isReset, description, exports };
+  const children = isDir ? scanChildren(modulePath) : undefined;
+  return { name: modulePath, source, imports, description, exports, children };
 }
 
 export function getAllModules(): ModuleMeta[] {
   const modules = getModuleNames().map(getModuleContent);
-  modules.sort((a, b) => {
-    if (a.isReset !== b.isReset) return a.isReset ? 1 : -1;
-    return a.name.localeCompare(b.name);
-  });
+  modules.sort((a, b) => a.name.localeCompare(b.name));
   return modules;
 }

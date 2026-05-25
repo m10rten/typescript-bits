@@ -8,7 +8,8 @@ import { InstallCommand } from "#/install-command";
 
 export default function Home() {
   const allModules = getAllModules();
-  const topLevelModules = allModules.filter((m) => !m.isReset);
+  const simpleModules = allModules.filter((m) => !m.children);
+  const folderModules = allModules.filter((m) => m.children);
 
   return (
     <div className="flex flex-col flex-1">
@@ -37,8 +38,8 @@ export default function Home() {
               typescript-bits
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl text-balance">
-              Production-ready TypeScript utility primitives. Result, Atom, Queue, Safe, Retry, RichJSON, and type
-              reset modules — zero-dependency, tree-shakeable, fully typed.
+              Production-ready TypeScript utility primitives. Result, Atom, Queue, Safe, Retry, RichJSON, and reset
+              type modules — zero-dependency, tree-shakeable, fully typed.
             </p>
             <div className="flex flex-wrap gap-3 mt-2">
               <Button nativeButton={false} render={<Link href="/docs" />}>
@@ -64,12 +65,12 @@ export default function Home() {
           Modules
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {topLevelModules.map((m) => (
+          {simpleModules.map((m) => (
             <Card key={m.name}>
               <CardHeader>
                 <CardTitle>
                   <Link href={`/docs/${m.name}`} className="hover:underline">
-                    {m.name}.ts
+                    {m.name}
                   </Link>
                 </CardTitle>
                 <CardDescription>{m.description}</CardDescription>
@@ -80,6 +81,21 @@ export default function Home() {
                 ) : (
                   <Badge variant="ghost">zero deps</Badge>
                 )}
+              </CardFooter>
+            </Card>
+          ))}
+          {folderModules.map((m) => (
+            <Card key={m.name}>
+              <CardHeader>
+                <CardTitle>
+                  <Link href={`/docs/${m.name}`} className="hover:underline">
+                    {m.name}
+                  </Link>
+                </CardTitle>
+                <CardDescription>{m.description}</CardDescription>
+              </CardHeader>
+              <CardFooter>
+                <Badge variant="secondary">{m.children?.length ?? 0} submodule(s)</Badge>
               </CardFooter>
             </Card>
           ))}

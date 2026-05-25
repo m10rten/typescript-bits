@@ -7,8 +7,8 @@ import { getAllModules } from "../../../../scripts/source-files";
 
 export default function IntroductionPage() {
   const allModules = getAllModules();
-  const topLevelModules = allModules.filter((m) => !m.isReset);
-  const resetModules = allModules.filter((m) => m.isReset);
+  const simpleModules = allModules.filter((m) => !m.children);
+  const folderModules = allModules.filter((m) => m.children);
 
   return (
     <div className="flex flex-col container-main py-8 gap-6">
@@ -78,9 +78,9 @@ export default function IntroductionPage() {
             </p>
           </div>
           <div className="rounded-lg border p-4">
-            <h3 className="font-semibold">Type Resets</h3>
+            <h3 className="font-semibold">Reset</h3>
             <p className="text-sm text-muted-foreground mt-1">
-              Global type augmentations for better DX — Array.filter, Map.get, JSON.parse, etc.
+              Global type augmentations for better DX — Array.filter, JSON.parse, Set, etc.
             </p>
           </div>
         </div>
@@ -110,16 +110,16 @@ export default function IntroductionPage() {
       <Tabs defaultValue="modules">
         <TabsList>
           <TabsTrigger value="modules">Modules</TabsTrigger>
-          <TabsTrigger value="resets">Type Resets</TabsTrigger>
+          <TabsTrigger value="folders">Folder Modules</TabsTrigger>
         </TabsList>
         <TabsContent value="modules" className="mt-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {topLevelModules.map((m) => (
+            {simpleModules.map((m) => (
               <Card key={m.name}>
                 <CardHeader>
                   <CardTitle>
                     <Link href={`/docs/${m.name}`} className="hover:underline">
-                      {m.name}.ts
+                      {m.name}
                     </Link>
                   </CardTitle>
                   <CardDescription>{m.description}</CardDescription>
@@ -135,20 +135,20 @@ export default function IntroductionPage() {
             ))}
           </div>
         </TabsContent>
-        <TabsContent value="resets" className="mt-4">
+        <TabsContent value="folders" className="mt-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {resetModules.map((m) => (
+            {folderModules.map((m) => (
               <Card key={m.name}>
                 <CardHeader>
                   <CardTitle>
                     <Link href={`/docs/${m.name}`} className="hover:underline">
-                      {m.name}.ts
+                      {m.name}
                     </Link>
                   </CardTitle>
                   <CardDescription>{m.description}</CardDescription>
                 </CardHeader>
                 <CardFooter>
-                  <Badge variant="secondary">type reset</Badge>
+                  <Badge variant="secondary">{m.children?.length ?? 0} submodule(s)</Badge>
                 </CardFooter>
               </Card>
             ))}

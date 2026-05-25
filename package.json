@@ -28,6 +28,7 @@
     "dist"
   ],
   "zshy": {
+    "bin": "./src/bin/cli/index.ts",
     "exports": {
       "./atom": "./src/atom.ts",
       "./json": "./src/json.ts",
@@ -98,5 +99,6 @@
       "import": "./dist/safe.js",
       "require": "./dist/safe.cjs"
     }
-  }
+  },
+  "bin": "./dist/bin/cli/index.cjs"
 }

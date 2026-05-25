@@ -26,12 +26,17 @@ A collection of TypeScript utility primitives (Result, deferred, cache, queue, e
 ## Project Structure
 
 ```
-src/          # Source code (rootDir for build)
+src/          # Library source code (rootDir for build)
+src/bin/      # CLI / binary tool source (not library modules)
 tests/        # Tests (colocated naming: <module>.test.ts)
 dist/         # Build output (generated, do not edit)
 docs/api/     # API documentation per module
 poc/          # Proof-of-concept / scratch code (excluded from build)
 ```
+
+> `src/bin/cli/` is the `npx typescript-bits` CLI. It is **not** a library module — exclude
+> it from any module-discovery or package-generation logic (the app's
+> `source-files.ts` already skips it).
 
 ---
 

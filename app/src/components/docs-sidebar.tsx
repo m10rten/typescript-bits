@@ -7,15 +7,7 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import type { ModuleMeta } from "../../scripts/source-files";
 
-export function DocsSidebar({
-  topLevelModules,
-  resetModules,
-  allModules,
-}: {
-  topLevelModules: ModuleMeta[];
-  resetModules: ModuleMeta[];
-  allModules: ModuleMeta[];
-}) {
+export function DocsSidebar({ allModules }: { allModules: ModuleMeta[] }) {
   const pathname = usePathname();
   const currentModule = pathname.startsWith("/docs/") ? pathname.replace("/docs/", "") : null;
   const currentData = currentModule ? (allModules.find((m) => m.name === currentModule) ?? null) : null;
@@ -90,8 +82,9 @@ export function DocsSidebar({
           <div>
             <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Modules</h2>
             <ul className="space-y-1">
-              {topLevelModules.map((m) => {
+              {allModules.map((m) => {
                 const active = currentModule === m.name;
+                const inSub = m.children?.some((c) => currentModule === `${m.name}/${c.name}`);
                 return (
                   <li key={m.name}>
                     <Link
@@ -99,11 +92,11 @@ export function DocsSidebar({
                       onClick={() => setMobileOpen(false)}
                       className={cn(
                         "block rounded px-2 py-1 text-sm transition-colors",
-                        active
+                        active || inSub
                           ? "bg-muted font-medium text-foreground"
                           : "text-muted-foreground hover:bg-muted hover:text-foreground",
                       )}>
-                      {m.name}.ts
+                      {m.name}
                     </Link>
                     {/* Quicklinks for active module */}
                     {active && m.exports.length > 0 && (
@@ -120,45 +113,28 @@ export function DocsSidebar({
                         ))}
                       </ul>
                     )}
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-
-          {/* Type Resets */}
-          <div>
-            <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Type Resets</h2>
-            <ul className="space-y-1">
-              {resetModules.map((m) => {
-                const displayName = m.name.replace(/^reset\./, "");
-                const active = currentModule === m.name;
-                return (
-                  <li key={m.name}>
-                    <Link
-                      href={`/docs/${m.name}`}
-                      onClick={() => setMobileOpen(false)}
-                      className={cn(
-                        "block rounded px-2 py-1 text-sm transition-colors",
-                        active
-                          ? "bg-muted font-medium text-foreground"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                      )}>
-                      {displayName}.ts
-                    </Link>
-                    {/* Quicklinks for active reset module */}
-                    {active && m.exports.length > 0 && (
+                    {/* Submodule children — only when active or inside a submodule */}
+                    {(active || inSub) && m.children && m.children.length > 0 && (
                       <ul className="ml-3 mt-1 space-y-0.5 border-l pl-2">
-                        {m.exports.map((exp) => (
-                          <li key={exp.name + exp.line}>
-                            <a
-                              href={`#${exp.name}`}
-                              onClick={() => setMobileOpen(false)}
-                              className="block truncate rounded px-2 py-0.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
-                              {exp.name}
-                            </a>
-                          </li>
-                        ))}
+                        {m.children.map((child) => {
+                          const childPath = `${m.name}/${child.name}`;
+                          const childActive = currentModule === childPath;
+                          return (
+                            <li key={child.name}>
+                              <Link
+                                href={`/docs/${childPath}`}
+                                onClick={() => setMobileOpen(false)}
+                                className={cn(
+                                  "block truncate rounded px-2 py-0.5 text-xs transition-colors",
+                                  childActive
+                                    ? "text-foreground font-medium"
+                                    : "text-muted-foreground hover:text-foreground",
+                                )}>
+                                {child.name}
+                              </Link>
+                            </li>
+                          );
+                        })}
                       </ul>
                     )}
                   </li>

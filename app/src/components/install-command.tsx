@@ -7,8 +7,6 @@ import { useState } from "react";
 const PACKAGE_MANAGERS = ["npm", "pnpm", "bun", "deno"] as const;
 type PackageManager = (typeof PACKAGE_MANAGERS)[number];
 
-type Mode = "install" | "run";
-
 const INSTALL_COMMANDS: Record<PackageManager, string> = {
   npm: "npm install typescript-bits",
   pnpm: "pnpm add typescript-bits",
@@ -16,24 +14,50 @@ const INSTALL_COMMANDS: Record<PackageManager, string> = {
   deno: "deno add npm:typescript-bits",
 };
 
-const RUN_COMMANDS: Record<PackageManager, string> = {
+const COPY_COMMANDS: Record<PackageManager, string> = {
   npm: "npx typescript-bits",
   pnpm: "pnpx typescript-bits",
   bun: "bunx typescript-bits",
   deno: "deno run -A npm:typescript-bits",
 };
 
+type Mode = "install" | "copy";
+
+const MODE_LABELS: Record<Mode, string> = {
+  install: "Install package",
+  copy: "Copy source",
+};
+
 export function InstallCommand({ module }: { module?: string }) {
   const [pm, setPm] = useState<PackageManager>("npm");
+  const [mode, setMode] = useState<Mode>(module ? "copy" : "install");
   const [copied, setCopied] = useState(false);
 
-  const mode: Mode = module ? "run" : "install";
-  const command = mode === "install" ? INSTALL_COMMANDS[pm] : `${RUN_COMMANDS[pm]} ${module}`;
+  const command = mode === "install" ? INSTALL_COMMANDS[pm] : `${COPY_COMMANDS[pm]}${module ? ` ${module}` : ""}`;
 
   return (
     <div className="rounded-lg border bg-card text-card-foreground">
       <div className="flex items-center justify-between gap-2 border-b px-4 py-2">
-        <span className="text-xs font-medium text-muted-foreground">{mode === "install" ? "Install" : "Run"}</span>
+        <div className="flex gap-1" role="group" aria-label="Install method">
+          {(["install", "copy"] as const).map((m) => (
+            <button
+              key={m}
+              type="button"
+              aria-pressed={mode === m}
+              disabled={!module && m === "copy"}
+              className={cn(
+                "inline-flex items-center justify-center rounded-md px-2.5 py-1 text-xs font-medium transition-all",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+                mode === m
+                  ? "bg-primary text-primary-foreground shadow-xs"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                !module && m === "copy" && "opacity-40 cursor-not-allowed",
+              )}
+              onClick={() => setMode(m)}>
+              {MODE_LABELS[m]}
+            </button>
+          ))}
+        </div>
         <div className="flex gap-1" role="group" aria-label="Package manager">
           {PACKAGE_MANAGERS.map((name) => (
             <button

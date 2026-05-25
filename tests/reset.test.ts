@@ -1,12 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import type { Equal, Expect, NotAny } from "./type-utils.js";
-import "../src/reset/json.js";
-import "../src/reset/fetch.js";
-import "../src/reset/array.js";
-import "../src/reset/filter.js";
-import "../src/reset/map.js";
-import "../src/reset/set.js";
+import "../src/reset/index.js";
 
 describe("reset", () => {
   describe("reset/json", () => {
