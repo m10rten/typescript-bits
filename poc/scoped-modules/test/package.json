@@ -1,0 +1,10 @@
+{
+  "name": "test",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@my-example-test/api": "file:../generated/api",
+    "@my-example-test/core": "file:../generated/core",
+    "my-example-test": "file:../generated/my-example-test"
+  }
+}
