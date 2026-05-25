@@ -117,6 +117,38 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+.container-main {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 64rem;
+  padding-inline: 1rem;
+}
+
+@media (min-width: 40rem) {
+  .container-main {
+    padding-inline: 1.5rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .container-main {
+    padding-inline: 2rem;
+  }
+}
+
+.hero-bg {
+  background-color: var(--background);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, color-mix(in oklch, var(--primary) 8%, transparent), transparent),
+    radial-gradient(ellipse 50% 40% at 70% 80%, color-mix(in oklch, var(--chart-2) 10%, transparent), transparent);
+}
+
+.dark .hero-bg {
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, color-mix(in oklch, var(--primary) 15%, transparent), transparent),
+    radial-gradient(ellipse 50% 40% at 70% 80%, color-mix(in oklch, var(--chart-2) 18%, transparent), transparent);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -127,4 +159,29 @@
   html {
     @apply font-sans;
   }
+}
+
+/* Line wrapping for all Shiki blocks */
+.shiki code {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Line numbers: only inside .code-block (module detail pages) */
+.code-block .shiki .line {
+  padding-left: 3.5rem;
+  position: relative;
+  min-height: 1lh;
+}
+
+.code-block .shiki .line::before {
+  content: attr(data-line);
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2.75rem;
+  text-align: right;
+  padding-right: 0.75rem;
+  color: #636d83;
+  user-select: none;
+  pointer-events: none;
 }

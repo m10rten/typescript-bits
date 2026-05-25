@@ -34,6 +34,7 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactStrictMode: true,
   poweredByHeader: false,
+  images: { unoptimized: true },
   // Apply the security headers to all routes
   async headers() {
     return [
