@@ -277,53 +277,83 @@ function writeFiles(files: ResolvedFile[], outDir: string, dryRun: boolean, over
   }
 }
 
-// ── Main ─────────────────────────────────────────────────────────────────
+// ── Terminal safety ──────────────────────────────────────────────────────
 
-async function main(): Promise<void> {
-  let pkgDir = dirname(fileURLToPath(import.meta.url));
-  while (!existsSync(join(pkgDir, "package.json")) && pkgDir !== resolve(pkgDir, "..")) {
-    pkgDir = resolve(pkgDir, "..");
+const SHOW_CURSOR = "\x1b[?25h";
+
+/**
+ * Ensures the terminal cursor is visible and stdin is restored, even on crash.
+ * Call this before any process.exit() or at the end of main().
+ */
+function restoreTerminal(): void {
+  try {
+    if (process.stdin.isRaw) process.stdin.setRawMode(false);
+  } catch {
+    // Ignore — not in raw mode or already closed
   }
-  const pkg = JSON.parse(readFileSync(join(pkgDir, "package.json"), "utf-8")) as Record<string, unknown>;
-  const pkgVersion = typeof pkg.version === "string" ? pkg.version : "0.0.0";
-
-  const opts = parseArgs(process.argv, pkgVersion);
-
-  let modules = opts.modules;
-  if (opts.all) {
-    modules = Object.keys(MODULES);
-  } else if (modules.length === 0) {
-    if (!process.stdout.isTTY) {
-      console.error("No modules specified. Use --all or provide module names.");
-      process.exit(1);
-    }
-    const selectOpts: SelectOption[] = Object.entries(MODULES).map(([name, info]) => ({
-      value: name,
-      label: name,
-      hint: info.desc,
-    }));
-    modules = await multiSelect(selectOpts);
-    if (modules.length === 0) {
-      console.log("\nNo modules selected.");
-      process.exit(0);
-    }
-  }
-
-  const sourceLabel = opts.srcDir ?? `${REPO}@${opts.tag}`;
-  console.log(`\n${dim("Source:")} ${sourceLabel}`);
-  console.log(`${dim("Output:")} ${opts.outDir}`);
-  console.log(`${dim("Modules:")} ${modules.join(", ")}\n`);
-
-  const files = await resolveDeps(modules, opts);
-  console.log(`\n${dim("Resolved")} ${files.length} file(s):`);
-  writeFiles(files, opts.outDir, opts.dryRun, opts.overwrite);
-
-  if (!opts.dryRun) {
-    console.log(`\n${green("Done!")} ${files.length} file(s) written to ${opts.outDir}/\n`);
+  try {
+    process.stdout.write(SHOW_CURSOR);
+  } catch {
+    // stdout may already be closed
   }
 }
 
-main().catch((err) => {
-  console.error(`\n${red("Error:")} ${err.message ?? err}`);
-  process.exit(1);
-});
+// Register terminal cleanup for all exit paths
+process.on("exit", restoreTerminal);
+process.on("SIGINT", () => process.exit(130));
+process.on("SIGTERM", () => process.exit(143));
+
+// ── Main ─────────────────────────────────────────────────────────────────
+
+async function main(): Promise<void> {
+  try {
+    let pkgDir = dirname(fileURLToPath(import.meta.url));
+    while (!existsSync(join(pkgDir, "package.json")) && pkgDir !== resolve(pkgDir, "..")) {
+      pkgDir = resolve(pkgDir, "..");
+    }
+    const pkg = JSON.parse(readFileSync(join(pkgDir, "package.json"), "utf-8")) as Record<string, unknown>;
+    const pkgVersion = typeof pkg.version === "string" ? pkg.version : "0.0.0";
+
+    const opts = parseArgs(process.argv, pkgVersion);
+
+    let modules = opts.modules;
+    if (opts.all) {
+      modules = Object.keys(MODULES);
+    } else if (modules.length === 0) {
+      if (!process.stdout.isTTY) {
+        console.error("No modules specified. Use --all or provide module names.");
+        process.exit(1);
+      }
+      const selectOpts: SelectOption[] = Object.entries(MODULES).map(([name, info]) => ({
+        value: name,
+        label: name,
+        hint: info.desc,
+      }));
+      modules = await multiSelect(selectOpts);
+      if (modules.length === 0) {
+        console.log("\nNo modules selected.");
+        process.exit(0);
+      }
+    }
+
+    const sourceLabel = opts.srcDir ?? `${REPO}@${opts.tag}`;
+    console.log(`\n${dim("Source:")} ${sourceLabel}`);
+    console.log(`${dim("Output:")} ${opts.outDir}`);
+    console.log(`${dim("Modules:")} ${modules.join(", ")}\n`);
+
+    const files = await resolveDeps(modules, opts);
+    console.log(`\n${dim("Resolved")} ${files.length} file(s):`);
+    writeFiles(files, opts.outDir, opts.dryRun, opts.overwrite);
+
+    if (!opts.dryRun) {
+      console.log(`\n${green("Done!")} ${files.length} file(s) written to ${opts.outDir}/\n`);
+    }
+  } catch (err) {
+    restoreTerminal();
+    const message = err && typeof err === "object" && "message" in err ? (err as Error).message : String(err);
+    console.error(`\n${red("Error:")} ${message}`);
+    process.exit(1);
+  }
+}
+
+main();

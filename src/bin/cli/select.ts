@@ -1,6 +1,11 @@
 /**
  * Interactive multi-select for the terminal.
  * Zero dependencies — uses raw terminal mode + ANSI escape codes.
+ *
+ * Rendering approach:
+ *   - Save cursor position before the initial draw.
+ *   - On every re-render, restore cursor, clear from there to end of screen,
+ *     then redraw. This avoids tracking line counts with cursor-up escapes.
  */
 
 import { emitKeypressEvents } from "node:readline";
@@ -13,7 +18,9 @@ const GREEN = "\x1b[32m";
 const RESET = "\x1b[0m";
 const HIDE_CURSOR = "\x1b[?25l";
 const SHOW_CURSOR = "\x1b[?25h";
-const CLEAR_LINE = "\x1b[2K";
+const SAVE_CURSOR = "\x1b[s";
+const RESTORE_CURSOR = "\x1b[u";
+const CLEAR_DOWN = "\x1b[J";
 
 function dim(s: string): string {
   return `${DIM}${s}${RESET}`;
@@ -62,27 +69,29 @@ export async function multiSelect(options: SelectOption[]): Promise<string[]> {
     return `${prefix} ${check} ${value}`;
   }
 
-  function render() {
-    const totalLines = options.length + 2;
-    stdout.write(`\x1b[${totalLines}A`);
-    stdout.write(`${CLEAR_LINE}${bold("?")} Select modules to install:\n`);
+  const lines: string[] = [];
+
+  function buildLines(): void {
+    lines.length = 0;
+    lines.push(`${bold("?")} Select modules to install:`);
     for (let i = 0; i < options.length; i++) {
       const opt = options[i]!;
-      stdout.write(
-        `${CLEAR_LINE}  ${renderCheckbox(opt.label, selected.has(opt.value), i === cursor)}  ${dim(opt.hint)}\n`,
-      );
+      lines.push(`  ${renderCheckbox(opt.label, selected.has(opt.value), i === cursor)}  ${dim(opt.hint)}`);
     }
-    stdout.write(`${CLEAR_LINE}${dim("(Space) Toggle  (A) All/None  (↑↓) Navigate  (Enter) Confirm")}`);
+    lines.push(`${dim("(Space) Toggle  (A) All/None  (↑↓) Navigate  (Enter) Confirm")}`);
   }
 
-  // Initial render
+  // ── Initial draw ───────────────────────────────────────────────────────
   stdout.write(HIDE_CURSOR);
-  stdout.write(`${bold("?")} Select modules to install:\n`);
-  for (let i = 0; i < options.length; i++) {
-    const opt = options[i]!;
-    stdout.write(`  ${renderCheckbox(opt.label, false, false)}  ${dim(opt.hint)}\n`);
+  buildLines();
+  stdout.write(SAVE_CURSOR);
+  stdout.write(lines.join("\n"));
+
+  // ── Re-render (restore cursor, clear down, redraw) ─────────────────────
+  function render(): void {
+    buildLines();
+    stdout.write(`${RESTORE_CURSOR}${CLEAR_DOWN}${lines.join("\n")}`);
   }
-  stdout.write(`${dim("(Space) Toggle  (A) All/None  (↑↓) Navigate  (Enter) Confirm")}`);
 
   return new Promise<string[]>((resolve) => {
     emitKeypressEvents(stdin);
@@ -91,51 +100,61 @@ export async function multiSelect(options: SelectOption[]): Promise<string[]> {
     stdin.resume();
 
     function onKeypress(_str: string, key: { name: string; ctrl: boolean }) {
-      if (key.ctrl && key.name === "c") {
-        cleanup();
-        process.exit(1);
-      }
+      try {
+        if (key.ctrl && key.name === "c") {
+          cleanup();
+          process.exit(1);
+        }
 
-      if (key.name === "return" || key.name === "enter") {
-        cleanup();
-        const result = [...selected];
-        stdout.write(`\n${green("✓")} ${result.length} module(s) selected\n`);
-        resolve(result);
-        return;
-      }
+        if (key.name === "return" || key.name === "enter") {
+          cleanup();
+          const result = [...selected];
+          stdout.write(`\n${green("✓")} ${result.length} module(s) selected\n`);
+          resolve(result);
+          return;
+        }
 
-      if (key.name === "up") {
-        cursor = cursor > 0 ? cursor - 1 : options.length - 1;
-        render();
-        return;
-      }
+        if (key.name === "up") {
+          cursor = cursor > 0 ? cursor - 1 : options.length - 1;
+          render();
+          return;
+        }
 
-      if (key.name === "down") {
-        cursor = cursor < options.length - 1 ? cursor + 1 : 0;
-        render();
-        return;
-      }
+        if (key.name === "down") {
+          cursor = cursor < options.length - 1 ? cursor + 1 : 0;
+          render();
+          return;
+        }
 
-      if (key.name === "space") {
-        const val = options[cursor]!.value;
-        if (selected.has(val)) selected.delete(val);
-        else selected.add(val);
-        render();
-        return;
-      }
+        if (key.name === "space") {
+          const val = options[cursor]!.value;
+          if (selected.has(val)) selected.delete(val);
+          else selected.add(val);
+          render();
+          return;
+        }
 
-      if (key.name === "a") {
-        if (selected.size === options.length) selected.clear();
-        else for (const opt of options) selected.add(opt.value);
-        render();
-        return;
+        if (key.name === "a") {
+          if (selected.size === options.length) selected.clear();
+          else for (const opt of options) selected.add(opt.value);
+          render();
+          return;
+        }
+      } catch {
+        // Ignore keypress errors during shutdown
       }
     }
 
     function cleanup() {
       stdin.removeListener("keypress", onKeypress as unknown as (...args: unknown[]) => void);
-      stdin.setRawMode(wasRaw ?? false);
-      stdin.pause();
+      try {
+        stdin.setRawMode(wasRaw ?? false);
+      } catch {
+        // Not in raw mode
+      }
+      // Don't call stdin.pause() — it triggers a libuv assertion on Windows
+      // (src/win/async.c:76). The listener is removed and raw mode is off,
+      // so stdin is effectively inert.
       stdout.write(SHOW_CURSOR);
     }
 
