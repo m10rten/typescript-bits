@@ -1,15 +1,12 @@
 import Link from "next/link";
 import { Button } from "#/ui/button";
-import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from "#/ui/card";
-import { Badge } from "#/ui/badge";
 import { GitBranch } from "lucide-react";
 import { getAllModules } from "../../scripts/source-files";
-import { InstallCommand } from "#/install-command";
+import { InstallHero } from "#/install-hero";
+import { ModuleCard } from "#/module-card";
 
 export default function Home() {
   const allModules = getAllModules();
-  const simpleModules = allModules.filter((m) => !m.children);
-  const folderModules = allModules.filter((m) => m.children);
 
   return (
     <div className="flex flex-col flex-1">
@@ -53,8 +50,8 @@ export default function Home() {
               </Button>
             </div>
 
-            <div className="mt-6 w-full max-w-md">
-              <InstallCommand />
+            <div className="mt-6 w-full max-w-lg">
+              <InstallHero modules={allModules.map((m) => m.name)} />
             </div>
           </div>
         </div>
@@ -64,40 +61,17 @@ export default function Home() {
         <h2 id="modules-title" className="text-2xl font-semibold mb-6">
           Modules
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {simpleModules.map((m) => (
-            <Card key={m.name}>
-              <CardHeader>
-                <CardTitle>
-                  <Link href={`/docs/${m.name}`} className="hover:underline">
-                    {m.name}
-                  </Link>
-                </CardTitle>
-                <CardDescription>{m.description}</CardDescription>
-              </CardHeader>
-              <CardFooter>
-                {m.imports.length > 0 ? (
-                  <Badge variant="outline">{m.imports.length} dep(s)</Badge>
-                ) : (
-                  <Badge variant="ghost">zero deps</Badge>
-                )}
-              </CardFooter>
-            </Card>
-          ))}
-          {folderModules.map((m) => (
-            <Card key={m.name}>
-              <CardHeader>
-                <CardTitle>
-                  <Link href={`/docs/${m.name}`} className="hover:underline">
-                    {m.name}
-                  </Link>
-                </CardTitle>
-                <CardDescription>{m.description}</CardDescription>
-              </CardHeader>
-              <CardFooter>
-                <Badge variant="secondary">{m.children?.length ?? 0} submodule(s)</Badge>
-              </CardFooter>
-            </Card>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {allModules.map((m) => (
+            <ModuleCard
+              key={m.name}
+              name={m.name}
+              href={`/docs/${m.name}`}
+              deps={m.children ? undefined : m.imports.length}
+              submodules={m.children?.length}
+              compact>
+              {m.description}
+            </ModuleCard>
           ))}
         </div>
       </section>

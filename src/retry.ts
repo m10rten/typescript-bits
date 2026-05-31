@@ -1,6 +1,18 @@
 import { Result } from "./result.js";
 import { Safe } from "./safe.js";
 
+/**
+ * Configuration for {@link retry}.
+ *
+ * @example
+ * ```ts
+ * import { retry } from "typescript-bits/retry";
+ *
+ * const result = retry(() => {
+ *   return Math.random() > 0.5 ? "ok" : "fail";
+ * }, { attempts: 5, delay: 100, backoff: true });
+ * ```
+ */
 export interface RetryOptions<E = unknown> {
   /** Maximum number of retry attempts (default: 3) */
   readonly attempts?: number;
@@ -17,14 +29,36 @@ export interface RetryOptions<E = unknown> {
 }
 
 /**
- * Retry a synchronous operation.
- * Returns Result<T, E> — ok on success, err after all attempts exhausted.
+ * Retry a synchronous operation with configurable backoff.
+ *
+ * @example
+ * ```ts
+ * import { retry } from "typescript-bits/retry";
+ *
+ * const result = retry(() => {
+ *   const ok = Math.random() > 0.7;
+ *   if (!ok) throw new Error("transient");
+ *   return "done";
+ * }, { attempts: 5, delay: 50, backoff: true, shouldRetry: () => true });
+ *
+ * if (result.ok) console.log(result.value);
+ * ```
  */
 export function retry<T, E = unknown>(fn: () => T, options?: RetryOptions<E>): Result<T, E>;
 
 /**
- * Retry an asynchronous operation.
- * Returns Promise<Result<T, E>> — ok on success, err after all attempts exhausted.
+ * Retry an async operation with configurable backoff.
+ *
+ * @example
+ * ```ts
+ * import { retry } from "typescript-bits/retry";
+ *
+ * const result = await retry(async () => {
+ *   const res = await fetch("https://api.example.com/data");
+ *   if (!res.ok) throw new Error("fetch failed");
+ *   return res.json();
+ * }, { attempts: 3, delay: 200, backoff: true });
+ * ```
  */
 export function retry<T, E = unknown>(fn: () => Promise<T>, options?: RetryOptions<E>): Promise<Result<T, E>>;
 

@@ -1,5 +1,19 @@
 import { Result } from "./result.js";
 
+/**
+ * Wrap throwable code and return a `Result` instead of crashing.
+ *
+ * @example
+ * ```ts
+ * import { Safe } from "typescript-bits/safe";
+ *
+ * const ok = Safe.sync(() => JSON.parse("42"));
+ * // ok.ok === true, ok.value === 42
+ *
+ * const fail = Safe.sync(() => JSON.parse("invalid"));
+ * // fail.ok === false, fail.error instanceof SyntaxError
+ * ```
+ */
 export namespace Safe {
   export function attempt<T, E = Error>(promise: Promise<T>, transform?: (error: unknown) => E): Promise<Result<T, E>>;
 

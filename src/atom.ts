@@ -1,3 +1,15 @@
+/**
+ * A reactive value container with subscriber notifications.
+ *
+ * @example
+ * ```ts
+ * import { atom, type Atom } from "typescript-bits/atom";
+ *
+ * const count = atom(0);
+ * count.set(1);
+ * count.get(); // 1
+ * ```
+ */
 export class Atom<T> {
   private value: T;
   private subs = new Set<(value: T) => void>();
@@ -38,6 +50,17 @@ export interface AtomFn<T extends (...args: never[]) => void> {
   subscribe(listener: T): () => void;
 }
 
+/**
+ * Create a reactive `Atom` value.
+ *
+ * @example
+ * ```ts
+ * import { atom } from "typescript-bits/atom";
+ *
+ * const count = atom(0);
+ * count.set(count.get() + 1);
+ * ```
+ */
 export function atom<T>(initial: T): Atom<T> {
   return new Atom(initial);
 }

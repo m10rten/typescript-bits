@@ -39,7 +39,7 @@ export function DocsSidebar({ allModules }: { allModules: ModuleMeta[] }) {
         className={cn(
           "flex flex-col bg-background overflow-y-auto",
           // Desktop: full viewport height below header
-          "md:sticky md:top-14 md:h-[calc(100vh-3.5rem)] md:w-64 md:shrink-0 md:self-start md:shadow-none md:z-40",
+          "md:sticky md:top-14 md:max-h-[calc(100vh-3.5rem)] md:w-64 md:shrink-0 md:self-start md:shadow-none md:z-40",
           // Mobile
           "fixed inset-y-0 left-0 w-72 z-50 shadow-xl transition-transform duration-200",
           mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
@@ -74,9 +74,6 @@ export function DocsSidebar({ allModules }: { allModules: ModuleMeta[] }) {
               })}
             </ul>
           </div>
-
-          {/* Separator */}
-          <div aria-hidden="true" className="border-t" />
 
           {/* Modules */}
           <div>

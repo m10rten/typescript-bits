@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ThemeToggle } from "#/theme-toggle";
+import { Search } from "#/search";
+import type { SearchItemData } from "~/search-index";
 
-export function StickyHeader() {
+export function StickyHeader({ searchItems }: { searchItems: SearchItemData[] }) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -25,14 +28,18 @@ export function StickyHeader() {
           "flex h-14 items-center gap-6 px-4 sm:px-6 lg:px-8 transition-[height] duration-300 ease-out " +
           (scrolled ? "max-sm:h-12" : "")
         }>
-        <a href="/" className="font-medium">
+        <a href="/" className="font-medium shrink-0">
           typescript-bits
         </a>
-        <nav aria-label="Main" className="flex items-center gap-4 text-sm">
+        <nav aria-label="Main" className="flex items-center gap-4 text-sm shrink-0">
           <a href="/docs/introduction" className="hover:text-foreground transition-colors">
             Docs
           </a>
         </nav>
+        <div className="flex-1 flex justify-center">
+          <Search items={searchItems} />
+        </div>
+        <ThemeToggle />
       </div>
     </header>
   );

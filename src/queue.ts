@@ -1,3 +1,17 @@
+/**
+ * Events emitted by {@link Queue}.
+ *
+ * @example
+ * ```ts
+ * import { Queue } from "typescript-bits/queue";
+ *
+ * const q = new Queue<number>();
+ * q.on((event) => {
+ *   if (event.type === "push") console.log("pushed:", event.item);
+ * });
+ * q.push(1); // "pushed: 1"
+ * ```
+ */
 export type QueueEvent<T> =
   | { type: "push"; item: T }
   | { type: "pop"; item: T }
@@ -6,6 +20,20 @@ export type QueueEvent<T> =
   | { type: "idle" }
   | { type: "error"; error: Error };
 
+/**
+ * An event-driven FIFO queue with typed lifecycle events.
+ *
+ * @example
+ * ```ts
+ * import { Queue } from "typescript-bits/queue";
+ *
+ * const queue = new Queue<string>();
+ * queue.push("a");
+ * queue.push("b");
+ * queue.pop(); // "a"
+ * queue.size;  // 1
+ * ```
+ */
 export class Queue<T> {
   #items: T[];
   #listeners: Set<(event: QueueEvent<T>) => void>;

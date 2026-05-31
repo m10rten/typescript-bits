@@ -161,6 +161,25 @@
   }
 }
 
+/* Line numbers for usage examples */
+.usage-examples .shiki .line {
+  padding-left: 3.5rem;
+  position: relative;
+  min-height: 1lh;
+}
+
+.usage-examples .shiki .line::before {
+  content: attr(data-line);
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2.75rem;
+  text-align: right;
+  padding-right: 0.75rem;
+  color: #636d83;
+  user-select: none;
+  pointer-events: none;
+}
+
 /* Line wrapping for all Shiki blocks */
 .shiki code {
   display: flex;

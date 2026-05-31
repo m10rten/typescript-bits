@@ -78,12 +78,33 @@ function encodeValue(value: unknown): unknown {
   return undefined;
 }
 
-/** Replacer for use with native `JSON.stringify(value, replacer)`. Encodes special types. */
+/**
+ * Replacer for use with native `JSON.stringify`. Encodes special types (Map, Set, Date, etc.).
+ *
+ * @example
+ * ```ts
+ * import { replacer } from "typescript-bits/json";
+ *
+ * const str = JSON.stringify({ date: new Date("2025-01-01") }, replacer);
+ * // str contains tagged Date representation
+ * ```
+ */
 export function replacer(_key: string, value: unknown): unknown {
   return encodeValue(value) ?? value;
 }
 
-/** Reviver for use with native `JSON.parse(text, reviver)`. Restores tagged special types. */
+/**
+ * Reviver for use with native `JSON.parse`. Restores tagged special types from {@link replacer}.
+ *
+ * @example
+ * ```ts
+ * import { replacer, reviver } from "typescript-bits/json";
+ *
+ * const str = JSON.stringify({ date: new Date("2025-01-01") }, replacer);
+ * const obj = JSON.parse(str, reviver);
+ * // obj.date is a genuine Date again
+ * ```
+ */
 export function reviver(_key: string, value: unknown): unknown {
   if (isTaggedValue(value)) {
     return restoreType(value);
@@ -91,6 +112,19 @@ export function reviver(_key: string, value: unknown): unknown {
   return value;
 }
 
+/**
+ * Rich JSON — stringify and parse with extended type support (Map, Set, Date, BigInt, etc.).
+ *
+ * @example
+ * ```ts
+ * import { RichJSON } from "typescript-bits/json";
+ *
+ * const data = { map: new Map([["a", 1]]), date: new Date() };
+ * const str = RichJSON.stringify(data);
+ * const parsed = RichJSON.parse(str);
+ * // parsed.map is a Map, parsed.date is a Date
+ * ```
+ */
 export namespace RichJSON {
   export function parse(text: string, userReviver?: (key: string, value: unknown) => unknown): unknown {
     const parsed = JSON.parse(text);

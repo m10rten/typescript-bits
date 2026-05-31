@@ -1,15 +1,7 @@
-import Link from "next/link";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "#/ui/breadcrumb";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "#/ui/tabs";
-import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from "#/ui/card";
-import { Badge } from "#/ui/badge";
-import { getAllModules } from "../../../../scripts/source-files";
+import { ModuleCard } from "#/module-card";
 
 export default function IntroductionPage() {
-  const allModules = getAllModules();
-  const simpleModules = allModules.filter((m) => !m.children);
-  const folderModules = allModules.filter((m) => m.children);
-
   return (
     <div className="flex flex-col container-main py-8 gap-6">
       <Breadcrumb>
@@ -35,54 +27,30 @@ export default function IntroductionPage() {
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-          <div className="rounded-lg border p-4">
-            <h3 className="font-semibold">Atom</h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              Reactive state atom with subscriptions — lightweight signals for state management.
-            </p>
-          </div>
-          <div className="rounded-lg border p-4">
-            <h3 className="font-semibold">Result</h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              Type-safe Ok/Err discriminated union — explicit error handling without try/catch.
-            </p>
-          </div>
-          <div className="rounded-lg border p-4">
-            <h3 className="font-semibold">Queue</h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              Event-driven queue with a typed event system — push, shift, and subscribe.
-            </p>
-          </div>
-          <div className="rounded-lg border p-4">
-            <h3 className="font-semibold">Safe</h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              Wrap any throwable function and return a Result — no more uncaught exceptions.
-            </p>
-          </div>
-          <div className="rounded-lg border p-4">
-            <h3 className="font-semibold">Retry</h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              Configurable retry with backoff strategies — exponential, linear, or custom.
-            </p>
-          </div>
-          <div className="rounded-lg border p-4">
-            <h3 className="font-semibold">Rich JSON</h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              Extended JSON serialization supporting Dates, Maps, Sets, and more.
-            </p>
-          </div>
-          <div className="rounded-lg border p-4">
-            <h3 className="font-semibold">Types</h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              Utility types like <code>Enumerate</code> and <code>Range</code> for numeric type gymnastics.
-            </p>
-          </div>
-          <div className="rounded-lg border p-4">
-            <h3 className="font-semibold">Reset</h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              Global type augmentations for better DX — Array.filter, JSON.parse, Set, etc.
-            </p>
-          </div>
+          <ModuleCard name="Atom" href="/docs/atom" deps={0}>
+            Reactive state atom with subscriptions — lightweight signals for state management.
+          </ModuleCard>
+          <ModuleCard name="Result" href="/docs/result" deps={0}>
+            Type-safe Ok/Err discriminated union — explicit error handling without try/catch.
+          </ModuleCard>
+          <ModuleCard name="Queue" href="/docs/queue" deps={0}>
+            Event-driven queue with a typed event system — push, shift, and subscribe.
+          </ModuleCard>
+          <ModuleCard name="Safe" href="/docs/safe" deps={1}>
+            Wrap any throwable function and return a Result — no more uncaught exceptions.
+          </ModuleCard>
+          <ModuleCard name="Retry" href="/docs/retry" deps={2}>
+            Configurable retry with backoff strategies — exponential, linear, or custom.
+          </ModuleCard>
+          <ModuleCard name="Rich JSON" href="/docs/json" deps={0}>
+            Extended JSON serialization supporting Dates, Maps, Sets, and more.
+          </ModuleCard>
+          <ModuleCard name="Types" href="/docs/types" deps={0}>
+            Utility types like <code>Enumerate</code> and <code>Range</code> for numeric type gymnastics.
+          </ModuleCard>
+          <ModuleCard name="Reset" href="/docs/reset" submodules={6}>
+            Global type augmentations for better DX — Array.filter, JSON.parse, Set, etc.
+          </ModuleCard>
         </div>
 
         <h2 className="text-xl font-semibold mt-10">Design principles</h2>
@@ -101,60 +69,6 @@ export default function IntroductionPage() {
           </li>
         </ul>
       </div>
-
-      <hr className="border-t" />
-
-      <h2 className="text-2xl font-bold tracking-tight">All modules</h2>
-      <p className="text-muted-foreground">Browse all available modules and type reset augmentations.</p>
-
-      <Tabs defaultValue="modules">
-        <TabsList>
-          <TabsTrigger value="modules">Modules</TabsTrigger>
-          <TabsTrigger value="folders">Folder Modules</TabsTrigger>
-        </TabsList>
-        <TabsContent value="modules" className="mt-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {simpleModules.map((m) => (
-              <Card key={m.name}>
-                <CardHeader>
-                  <CardTitle>
-                    <Link href={`/docs/${m.name}`} className="hover:underline">
-                      {m.name}
-                    </Link>
-                  </CardTitle>
-                  <CardDescription>{m.description}</CardDescription>
-                </CardHeader>
-                <CardFooter>
-                  {m.imports.length > 0 ? (
-                    <Badge variant="outline">{m.imports.length} dep(s)</Badge>
-                  ) : (
-                    <Badge variant="ghost">zero deps</Badge>
-                  )}
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-        <TabsContent value="folders" className="mt-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {folderModules.map((m) => (
-              <Card key={m.name}>
-                <CardHeader>
-                  <CardTitle>
-                    <Link href={`/docs/${m.name}`} className="hover:underline">
-                      {m.name}
-                    </Link>
-                  </CardTitle>
-                  <CardDescription>{m.description}</CardDescription>
-                </CardHeader>
-                <CardFooter>
-                  <Badge variant="secondary">{m.children?.length ?? 0} submodule(s)</Badge>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-      </Tabs>
     </div>
   );
 }

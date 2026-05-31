@@ -35,6 +35,20 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   images: { unoptimized: true },
+  async redirects() {
+    return [
+      {
+        source: "/docs",
+        destination: "/docs/introduction",
+        permanent: true,
+      },
+      {
+        source: "/docs/",
+        destination: "/docs/introduction",
+        permanent: true,
+      },
+    ];
+  },
   // Apply the security headers to all routes
   async headers() {
     return [

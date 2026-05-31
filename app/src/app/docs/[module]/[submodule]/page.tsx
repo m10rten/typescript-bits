@@ -9,9 +9,18 @@ import {
   BreadcrumbPage,
 } from "#/ui/breadcrumb";
 import { Badge } from "#/ui/badge";
-import { getModuleNames, getModuleContent, highlightCode, addCodeAnchors } from "../../../../../scripts/source-files";
-import { CodeBlock } from "../code-block";
-import { InstallCommand } from "#/install-command";
+import { Suspense } from "react";
+import {
+  getModuleNames,
+  getModuleContent,
+  highlightCode,
+  addCodeAnchors,
+  getImportCode,
+  getLocalImportCode,
+  concatExampleCode,
+} from "../../../../../scripts/source-files";
+import { ViewToggle } from "#/view-toggle";
+import { PageContent } from "#/page-content";
 
 export function generateStaticParams() {
   const params: { module: string; submodule: string }[] = [];
@@ -36,25 +45,60 @@ export default async function SubmodulePage({ params }: { params: Promise<{ modu
     notFound();
   }
 
-  const highlighted = addCodeAnchors(await highlightCode(module.source), module.exports);
+  const highlighted = addCodeAnchors(await highlightCode(module.sourceClean), module.exportsClean);
+
+  // Compute truncated source for collapsed "Copy Source" view
+  // Show fewer lines when just over 50 so the expand button always has weight
+  const MAX_SHOW = 50;
+  const MIN_SHOW = 30;
+  const HIDE_OFFSET = 20;
+  const sourceLines = module.sourceClean.split("\n");
+  const totalLines = sourceLines.length;
+  const displayLines =
+    totalLines > MAX_SHOW ? Math.max(MIN_SHOW, Math.min(MAX_SHOW, totalLines - HIDE_OFFSET)) : totalLines;
+  const isSourceLong = totalLines > MAX_SHOW;
+  const truncatedSource = isSourceLong ? sourceLines.slice(0, displayLines).join("\n") : module.sourceClean;
+  const truncatedHtml = isSourceLong
+    ? addCodeAnchors(
+        await highlightCode(truncatedSource),
+        module.exportsClean.filter((e) => e.line <= displayLines),
+      )
+    : undefined;
+
+  // Pre-highlight import statements
+  const importCode = getImportCode(modulePath);
+  const importHtml = await highlightCode(importCode);
+
+  const importLocalCode = getLocalImportCode(modulePath);
+  const importLocalHtml = await highlightCode(importLocalCode);
+
+  // Build concatenated examples and highlight as a single block
+  const combinedCode = concatExampleCode(module.examples);
+  const examplesHtml = combinedCode ? addCodeAnchors(await highlightCode(combinedCode), []) : "";
 
   return (
     <div className="flex flex-col container-main py-8 gap-6">
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/docs">Docs</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href={`/docs/${moduleName}`}>{moduleName}</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{submoduleName}</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      {/* Breadcrumbs + View Toggle */}
+      <div className="flex items-center justify-between gap-4">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/docs">Docs</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href={`/docs/${moduleName}`}>{moduleName}</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{submoduleName}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <Suspense>
+          <ViewToggle />
+        </Suspense>
+      </div>
 
       <div className="flex flex-col gap-1">
         <h1 className="text-3xl font-bold tracking-tight">
@@ -78,11 +122,19 @@ export default async function SubmodulePage({ params }: { params: Promise<{ modu
         <Badge variant="secondary">submodule of {moduleName}</Badge>
       </div>
 
-      <div className="max-w-md">
-        <InstallCommand module={modulePath} />
-      </div>
-
-      <CodeBlock html={highlighted} source={module.source} displayName={`${moduleName}/${submoduleName}`} />
+      {/* Toggled content */}
+      <Suspense fallback={<div className="text-muted-foreground text-sm">Loading…</div>}>
+        <PageContent
+          sourceHtml={highlighted}
+          sourceTruncatedHtml={truncatedHtml}
+          sourceTotalLines={totalLines}
+          sourceCode={module.sourceClean}
+          sourceName={`${moduleName}/${submoduleName}`}
+          importHtml={importHtml}
+          importLocalHtml={importLocalHtml}
+          examplesHtml={examplesHtml}
+        />
+      </Suspense>
     </div>
   );
 }

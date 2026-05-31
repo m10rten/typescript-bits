@@ -10,7 +10,9 @@
     "precommit": "pnpm format:check && pnpm typecheck",
     "typecheck": "tsc --noEmit",
     "build": "zshy",
-    "test": "tsx --test tests/*.test.ts"
+    "test": "tsx --test tests/*.test.ts",
+    "start": "pnpm --filter app start",
+    "dev": "pnpm --filter app dev"
   },
   "keywords": [],
   "author": "m10rten",
@@ -39,8 +41,11 @@
       "./reset/map": "./src/reset/map.ts",
       "./reset/set": "./src/reset/set.ts",
       "./reset": "./src/reset/index.ts",
+      "./queue": "./src/queue.ts",
       "./result": "./src/result.ts",
-      "./safe": "./src/safe.ts"
+      "./retry": "./src/retry.ts",
+      "./safe": "./src/safe.ts",
+      "./types": "./src/types.ts"
     }
   },
   "exports": {
@@ -89,15 +94,30 @@
       "import": "./dist/reset/index.js",
       "require": "./dist/reset/index.cjs"
     },
+    "./queue": {
+      "types": "./dist/queue.d.cts",
+      "import": "./dist/queue.js",
+      "require": "./dist/queue.cjs"
+    },
     "./result": {
       "types": "./dist/result.d.cts",
       "import": "./dist/result.js",
       "require": "./dist/result.cjs"
     },
+    "./retry": {
+      "types": "./dist/retry.d.cts",
+      "import": "./dist/retry.js",
+      "require": "./dist/retry.cjs"
+    },
     "./safe": {
       "types": "./dist/safe.d.cts",
       "import": "./dist/safe.js",
       "require": "./dist/safe.cjs"
+    },
+    "./types": {
+      "types": "./dist/types.d.cts",
+      "import": "./dist/types.js",
+      "require": "./dist/types.cjs"
     }
   },
   "bin": "./dist/bin/cli/index.cjs"
