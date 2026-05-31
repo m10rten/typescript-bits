@@ -65,12 +65,15 @@ export default function RootLayout({
                     className="underline underline-offset-2 hover:text-foreground transition-colors">
                     m10rten ↗
                   </a>
-                  <a href="/tos" className="hover:text-foreground transition-colors">
-                    Terms
+                  <a
+                    href="/terms-of-service"
+                    title="Terms of Service"
+                    className="hover:text-foreground transition-colors">
+                    Terms of Service
                   </a>
                 </nav>
               </div>
-              <p className="text-xs">&copy; {new Date().getFullYear()} typescript-bits</p>
+              <p className="text-xs italic font-bold">&copy; {new Date().getFullYear()} typescript-bits</p>
             </div>
           </footer>
         </ThemeProvider>
