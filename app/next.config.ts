@@ -1,11 +1,19 @@
 import type { NextConfig } from "next";
 
+const isProduction = process.env.NODE_ENV === "production";
+// Disable HTTPS-specific headers with HTTPS=false (e.g. when accessing over HTTP by IP)
+const hasHttps = process.env.HTTPS !== "false";
+
+const cspBase =
+  "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'";
+
 const securityHeaders = [
   {
     key: "Content-Security-Policy",
     // Strict CSP tailored for static sites. Adjust your connect-src/img-src if using external APIs/CDNs.
-    value:
-      "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;",
+    // upgrade-insecure-requests is production-only: in dev over HTTP it causes protocol-mismatch errors
+    // when browsers (React DevTools, etc.) inject frames.
+    value: `${cspBase}${isProduction && hasHttps ? "; upgrade-insecure-requests" : ""}`,
   },
   {
     key: "X-Frame-Options",
@@ -24,10 +32,15 @@ const securityHeaders = [
     // Disables access to sensitive browser features your static site likely doesn't need
     value: "camera=(), microphone=(), geolocation=(), interest-cohort=()",
   },
-  {
-    key: "Strict-Transport-Security",
-    value: "max-age=31536000; includeSubDomains; preload", // Forces HTTPS connections
-  },
+  ...(isProduction && hasHttps
+    ? [
+        {
+          // Forces HTTPS connections
+          key: "Strict-Transport-Security",
+          value: "max-age=31536000; includeSubDomains; preload",
+        },
+      ]
+    : []),
 ];
 
 const nextConfig: NextConfig = {

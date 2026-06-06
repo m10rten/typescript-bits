@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "#/ui/button";
-import { cn } from "~/utils";
+import { cn, copyToClipboard } from "~/utils";
 import { useState } from "react";
 
 const PACKAGE_MANAGERS = ["npm", "pnpm", "bun", "deno"] as const;
@@ -86,7 +86,7 @@ export function InstallCommand({ module }: { module?: string }) {
           size="sm"
           aria-label={`Copy ${mode} command for ${pm}`}
           onClick={() => {
-            navigator.clipboard.writeText(command).then(() => {
+            copyToClipboard(command).then(() => {
               setCopied(true);
               setTimeout(() => setCopied(false), 2000);
             });

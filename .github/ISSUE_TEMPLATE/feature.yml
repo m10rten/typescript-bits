@@ -1,0 +1,50 @@
+name: Feature Request
+description: Suggest an idea for this project
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](../blob/main/CODE_OF_CONDUCT.md).
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
+
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to suggest an improvement!
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Is your feature request related to a problem? Please describe.
+      placeholder: I'm always frustrated when [...]
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: What do you want to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Any alternative solutions or workarounds you've thought of.
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Mockups, examples, references, or anything else that helps.
+    validations:
+      required: false

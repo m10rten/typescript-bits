@@ -1,6 +1,15 @@
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "#/ui/breadcrumb";
 import { ModuleCard } from "#/module-card";
 
+export const pageContent =
+  "A collection of production-ready TypeScript utility primitives — zero-dependency building blocks for everyday patterns. " +
+  "Design principles: Zero dependencies, Tree-shakeable by default, Strict TypeScript, Production first. " +
+  "Every module is a standalone .ts file you can import directly. No bundler magic, no barrel exports. " +
+  "Modules include: Atom reactive state with subscriptions, Result type-safe Ok/Err error handling, " +
+  "Queue event-driven queue with typed events, Safe wrap throwable functions returning a Result, " +
+  "Retry configurable retry with exponential backoff strategies, Rich JSON serialization for Dates Maps and Sets, " +
+  "Types utility types Enumerate and Range, Reset global type augmentations for Array.filter JSON.parse Set.";
+
 export default function IntroductionPage() {
   return (
     <div className="flex flex-col container-main py-8 gap-6">

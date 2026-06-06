@@ -1,0 +1,90 @@
+name: Bug Report
+description: Report something that isn't working
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](../blob/main/CODE_OF_CONDUCT.md).
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
+
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to report a bug!
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this issue?
+      placeholder: |
+        1. Go to '...'
+        2. Run '...'
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: code
+    attributes:
+      label: Relevant Code
+      description: Minimal code sample that reproduces the issue.
+      render: typescript
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: Package Version
+      description: Which version of typescript-bits are you using?
+      placeholder: e.g. 1.0.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      options:
+        - Windows
+        - macOS
+        - Linux
+    validations:
+      required: true
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Node Version
+      placeholder: e.g. 24, 26
+    validations:
+      required: true

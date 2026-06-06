@@ -23,6 +23,8 @@ interface PageContentProps {
   importLocalHtml: string;
   /** Pre-highlighted HTML of concatenated usage examples */
   examplesHtml: string;
+  /** Pre-highlighted HTML of concatenated usage examples with local import paths (for Copy Source) */
+  examplesLocalHtml?: string;
   /** Optional children rendered in "Install Package" view before examples (e.g. submodule cards) */
   children?: ReactNode;
 }
@@ -36,6 +38,7 @@ export function PageContent({
   importHtml,
   importLocalHtml,
   examplesHtml,
+  examplesLocalHtml,
   children,
 }: PageContentProps) {
   const searchParams = useSearchParams();
@@ -63,7 +66,7 @@ export function PageContent({
       {/* "Copy Source" — usage (above) + source code */}
       {view === "source-copy" && (
         <div className="flex flex-col gap-6">
-          <UsageView examplesHtml={examplesHtml} />
+          <UsageView examplesHtml={examplesLocalHtml ?? examplesHtml} />
           <CodeBlock
             html={sourceHtml}
             truncatedHtml={sourceTruncatedHtml}

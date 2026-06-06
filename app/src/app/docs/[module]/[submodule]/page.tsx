@@ -18,6 +18,7 @@ import {
   getImportCode,
   getLocalImportCode,
   concatExampleCode,
+  transformImportsToLocal,
 } from "../../../../../scripts/source-files";
 import { ViewToggle } from "#/view-toggle";
 import { PageContent } from "#/page-content";
@@ -75,6 +76,8 @@ export default async function SubmodulePage({ params }: { params: Promise<{ modu
   // Build concatenated examples and highlight as a single block
   const combinedCode = concatExampleCode(module.examples);
   const examplesHtml = combinedCode ? addCodeAnchors(await highlightCode(combinedCode), []) : "";
+  const combinedLocalCode = transformImportsToLocal(combinedCode);
+  const examplesLocalHtml = combinedLocalCode ? addCodeAnchors(await highlightCode(combinedLocalCode), []) : "";
 
   return (
     <div className="flex flex-col container-main py-8 gap-6">
@@ -133,6 +136,7 @@ export default async function SubmodulePage({ params }: { params: Promise<{ modu
           importHtml={importHtml}
           importLocalHtml={importLocalHtml}
           examplesHtml={examplesHtml}
+          examplesLocalHtml={examplesLocalHtml}
         />
       </Suspense>
     </div>

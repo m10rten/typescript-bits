@@ -9,20 +9,29 @@
     "prepare": "husky",
     "precommit": "pnpm format:check && pnpm typecheck",
     "typecheck": "tsc --noEmit",
-    "build": "zshy",
+    "build": "zshy && pnpm --filter app build",
     "test": "tsx --test tests/*.test.ts",
     "start": "pnpm --filter app start",
-    "dev": "pnpm --filter app dev"
+    "dev": "pnpm --filter app dev",
+    "changeset": "changeset",
+    "release": "changeset publish"
   },
-  "keywords": [],
+  "keywords": [
+    "typescript",
+    "typescript-bits",
+    "zero dependencies",
+    "native",
+    "utilities"
+  ],
   "author": "m10rten",
   "license": "MIT",
   "packageManager": "pnpm@11.1.2",
   "devDependencies": {
+    "@changesets/cli": "2.31.0",
     "@types/node": "25.6.2",
     "husky": "9.1.7",
     "prettier": "3.8.3",
-    "tsx": "4.21.0",
+    "tsx": "4.22.3",
     "typescript": "6.0.3",
     "zshy": "0.7.2"
   },

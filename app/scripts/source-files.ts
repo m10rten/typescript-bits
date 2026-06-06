@@ -120,11 +120,46 @@ export function stripExampleBlocks(source: string): string {
 }
 
 /**
+ * Removes duplicate import statements from code. Keeps the first occurrence
+ * of each unique import line, discarding subsequent duplicates along with
+ * the blank line that follows them.
+ */
+function deduplicateImports(code: string): string {
+  const seen = new Set<string>();
+  const lines = code.split("\n");
+  const result: string[] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = lines[i]!.trim();
+    if (/^import\s/.test(trimmed)) {
+      if (seen.has(trimmed)) {
+        // Skip the blank line that follows the duplicate import
+        if (i + 1 < lines.length && lines[i + 1]!.trim() === "") i++;
+        continue;
+      }
+      seen.add(trimmed);
+    }
+    result.push(lines[i]!);
+  }
+
+  return result.join("\n");
+}
+
+/**
+ * Replaces `typescript-bits` import paths with `../lib/bits/` local paths
+ * in import statements. Used to generate copy-source-friendly examples.
+ */
+export function transformImportsToLocal(code: string): string {
+  return code.replace(/"typescript-bits\//g, '"../lib/bits/');
+}
+
+/**
  * Concatenates usage examples into a single code string, with `// ExportName`
- * comments separating each example block.
+ * comments separating each example block. Duplicate import lines are stripped.
  */
 export function concatExampleCode(examples: ModuleExample[]): string {
-  return examples.map((ex) => `// ${ex.name}\n${ex.code}`).join("\n\n");
+  const code = examples.map((ex) => `// ${ex.name}\n${ex.code}`).join("\n\n");
+  return deduplicateImports(code);
 }
 
 /**

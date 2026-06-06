@@ -37,10 +37,16 @@ export function Search({ items }: SearchProps) {
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState("");
   const [placeholder, setPlaceholder] = useState("Search docs...");
+  const [isMac, setIsMac] = useState<boolean | null>(null);
 
   // Pick a random placeholder on mount
   useEffect(() => {
     setPlaceholder(QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)]!);
+  }, []);
+
+  // Detect platform for correct modifier key display
+  useEffect(() => {
+    setIsMac(navigator.platform.startsWith("Mac"));
   }, []);
 
   // Cmd+K / Ctrl+K to toggle
@@ -82,6 +88,7 @@ export function Search({ items }: SearchProps) {
       .map((item) => {
         const title = item.title.toLowerCase();
         const desc = item.description.toLowerCase();
+        const content = item.content?.toLowerCase() ?? "";
         let score = 0;
 
         if (title === q) score = 10;
@@ -89,6 +96,14 @@ export function Search({ items }: SearchProps) {
         else if (title.includes(q)) score = 5;
         else if (q.split(/\s+/).some((w) => title.includes(w))) score = 3;
         else if (desc.includes(q)) score = 2;
+        else if (content.includes(q)) score = 1;
+
+        // Also boost score when query words appear in content
+        if (score > 0 && score < 5) {
+          const words = q.split(/\s+/).filter((w) => w.length > 2);
+          const contentMatches = words.filter((w) => content.includes(w)).length;
+          if (contentMatches >= 2) score += 1;
+        }
 
         return { item, score };
       })
@@ -117,20 +132,22 @@ export function Search({ items }: SearchProps) {
         className="group flex items-center gap-2 h-8 w-full max-w-xs rounded-lg border border-input bg-muted/30 px-3 text-sm text-muted-foreground hover:bg-muted/50 hover:text-foreground hover:border-ring/50 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50">
         <SearchIcon className="size-3.5 shrink-0 opacity-60 group-hover:opacity-100 transition-opacity" />
         <span className="truncate">{placeholder}</span>
-        <span className="ml-auto hidden sm:flex items-center gap-0.5 text-[10px] text-muted-foreground/50">
-          <kbd className="inline-flex items-center justify-center rounded border border-border/50 px-1 font-sans leading-none py-0.5">
-            ⌘
-          </kbd>
-          <kbd className="inline-flex items-center justify-center rounded border border-border/50 px-1 font-sans leading-none py-0.5">
-            K
-          </kbd>
-        </span>
+        {isMac !== null && (
+          <span className="ml-auto hidden sm:flex items-center gap-0.5 text-[10px] text-muted-foreground/50">
+            <kbd className="inline-flex items-center justify-center rounded border border-border/50 px-1 font-sans leading-none py-0.5">
+              {isMac ? "⌘" : "Ctrl"}
+            </kbd>
+            <kbd className="inline-flex items-center justify-center rounded border border-border/50 px-1 font-sans leading-none py-0.5">
+              K
+            </kbd>
+          </span>
+        )}
       </button>
 
       {/* ── Search dialog ── */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent
-          className="top-[15%] sm:top-[20%] translate-y-0 min-w-xl p-0 overflow-hidden rounded-xl"
+          className="top-[15%] sm:top-[20%] translate-y-0 sm:min-w-xl md:min-w-2xl p-0 overflow-hidden rounded-xl"
           showCloseButton={false}>
           <Command shouldFilter={false} className="p-0!">
             {/* Search input row */}

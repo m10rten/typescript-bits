@@ -11,6 +11,16 @@ import { highlightCode } from "../../../../scripts/source-files";
 import Link from "next/link";
 import { CopyLine } from "./copy-line";
 
+export const pageContent =
+  "Three ways to use a module: Install Package via npm yarn pnpm bun from node_modules. " +
+  "Install Source via CLI — copy into project as editable source file, dependencies resolved automatically. " +
+  "Copy Source — navigate to module page, switch to Copy Source view, and copy highlighted code directly. " +
+  "ESM only — published as a native ES module package. Node.js 22+ required. TypeScript 5.7+. " +
+  "No bundler required — works with Node Bun Deno and all major bundlers. " +
+  "Source fetched from GitHub — CLI fetches module sources at runtime. " +
+  "CLI supports --path to customize output directory and interactive picker with A to toggle all. " +
+  "components.json with aliases.bits sets a persistent custom output path.";
+
 export default async function InstallationPage() {
   const packageImport = await highlightCode(`import { atom, type Atom } from "typescript-bits/atom";`, "ts");
   const localImport = await highlightCode(`import { atom, type Atom } from "../lib/bits/atom";`, "ts");

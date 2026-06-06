@@ -149,6 +149,10 @@
     radial-gradient(ellipse 50% 40% at 70% 80%, color-mix(in oklch, var(--chart-2) 18%, transparent), transparent);
 }
 
+.scrollbar-gutter-stable {
+  scrollbar-gutter: stable;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

@@ -5,6 +5,15 @@ export const metadata: Metadata = {
   description: "Terms of Service for the typescript-bits website and documentation.",
 };
 
+export const pageContent =
+  "Terms of Service for the typescript-bits website and documentation. " +
+  "The site hosts documentation about the typescript-bits open-source TypeScript library. " +
+  "The library source code is released under the MIT License. " +
+  "Content on this site includes text documentation graphics logos code samples and design. " +
+  "Site is provided as-is without warranties. " +
+  "Terms governed by the laws of the Netherlands. " +
+  "Contact via GitHub issues at github.com/m10rten/typescript-bits.";
+
 export default function TosPage() {
   return (
     <div className="container-main py-12 md:py-16">

@@ -19,6 +19,7 @@ import {
   getImportCode,
   getLocalImportCode,
   concatExampleCode,
+  transformImportsToLocal,
 } from "../../../../scripts/source-files";
 import { ViewToggle } from "#/view-toggle";
 import { PageContent } from "#/page-content";
@@ -66,6 +67,8 @@ export default async function ModulePage({ params }: { params: Promise<{ module:
   // Build concatenated examples and highlight as a single block
   const combinedCode = concatExampleCode(module.examples);
   const examplesHtml = combinedCode ? addCodeAnchors(await highlightCode(combinedCode), []) : "";
+  const combinedLocalCode = transformImportsToLocal(combinedCode);
+  const examplesLocalHtml = combinedLocalCode ? addCodeAnchors(await highlightCode(combinedLocalCode), []) : "";
 
   return (
     <div className="flex flex-col container-main py-8 gap-6">
@@ -117,7 +120,8 @@ export default async function ModulePage({ params }: { params: Promise<{ module:
             sourceName={module.name}
             importHtml={importHtml}
             importLocalHtml={importLocalHtml}
-            examplesHtml={examplesHtml}>
+            examplesHtml={examplesHtml}
+            examplesLocalHtml={examplesLocalHtml}>
             {/* Submodule cards shown in "Install Package" view before examples */}
             <div className="flex flex-col gap-4">
               <h2 className="text-xl font-semibold tracking-tight">Submodules</h2>
@@ -148,6 +152,7 @@ export default async function ModulePage({ params }: { params: Promise<{ module:
             importHtml={importHtml}
             importLocalHtml={importLocalHtml}
             examplesHtml={examplesHtml}
+            examplesLocalHtml={examplesLocalHtml}
           />
         )}
       </Suspense>

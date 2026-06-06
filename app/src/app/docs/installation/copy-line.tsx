@@ -2,6 +2,7 @@
 
 import { Copy } from "lucide-react";
 import { useState } from "react";
+import { copyToClipboard } from "~/utils";
 
 export function CopyLine({ code, highlighted }: { code: string; highlighted: string }) {
   const [copied, setCopied] = useState(false);
@@ -18,7 +19,7 @@ export function CopyLine({ code, highlighted }: { code: string; highlighted: str
         aria-label="Copy code"
         className="shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
         onClick={() => {
-          navigator.clipboard.writeText(code).then(() => {
+          copyToClipboard(code).then(() => {
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
           });
