@@ -1,0 +1,32 @@
+{
+  "name": "@typescript-bits/atom",
+  "version": "0.0.0",
+  "description": "Reactive state atom with subscriptions",
+  "type": "module",
+  "scripts": {
+    "build": "zshy",
+    "test": "tsx --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "zshy": {
+    "exports": {
+      ".": "./src/index.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.cts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  }
+}

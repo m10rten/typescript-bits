@@ -1,0 +1,68 @@
+{
+  "name": "@typescript-bits/reset",
+  "version": "0.0.0",
+  "description": "Global type augmentations for safer JavaScript built-ins",
+  "type": "module",
+  "scripts": {
+    "build": "zshy",
+    "test": "tsx --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "zshy": {
+    "exports": {
+      ".": "./src/index.ts",
+      "./array": "./src/array.ts",
+      "./fetch": "./src/fetch.ts",
+      "./filter": "./src/filter.ts",
+      "./json": "./src/json.ts",
+      "./map": "./src/map.ts",
+      "./set": "./src/set.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.cts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./array": {
+      "types": "./dist/array.d.cts",
+      "import": "./dist/array.js",
+      "require": "./dist/array.cjs"
+    },
+    "./fetch": {
+      "types": "./dist/fetch.d.cts",
+      "import": "./dist/fetch.js",
+      "require": "./dist/fetch.cjs"
+    },
+    "./filter": {
+      "types": "./dist/filter.d.cts",
+      "import": "./dist/filter.js",
+      "require": "./dist/filter.cjs"
+    },
+    "./json": {
+      "types": "./dist/json.d.cts",
+      "import": "./dist/json.js",
+      "require": "./dist/json.cjs"
+    },
+    "./map": {
+      "types": "./dist/map.d.cts",
+      "import": "./dist/map.js",
+      "require": "./dist/map.cjs"
+    },
+    "./set": {
+      "types": "./dist/set.d.cts",
+      "import": "./dist/set.js",
+      "require": "./dist/set.cjs"
+    }
+  }
+}

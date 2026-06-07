@@ -8,11 +8,16 @@
     "format:check": "prettier --check .",
     "prepare": "husky",
     "precommit": "pnpm format:check && pnpm typecheck",
-    "typecheck": "tsc --noEmit",
-    "build": "zshy && pnpm --filter app build",
-    "test": "tsx --test tests/*.test.ts",
-    "start": "pnpm --filter app start",
-    "dev": "pnpm --filter app dev",
+    "typecheck:packages": "pnpm -r --filter @typescript-bits/* typecheck",
+    "typecheck:app": "pnpm --filter app typecheck",
+    "dev:app": "pnpm --filter app dev",
+    "dev:cli": "tsx ./bin/cli.ts",
+    "typecheck": "pnpm typecheck:packages && pnpm typecheck:app",
+    "build": "pnpm build:packages && pnpm build:root && pnpm build:app",
+    "build:app": "pnpm --filter app build",
+    "build:root": "tsx scripts/build-umbrella.ts",
+    "build:packages": "pnpm -r --filter @typescript-bits/* build",
+    "test": "pnpm tsx --test ./packages/**/tests/*.test.ts",
     "changeset": "changeset",
     "release": "changeset publish"
   },
@@ -25,10 +30,17 @@
   ],
   "author": "m10rten",
   "license": "MIT",
+  "homepage": "https://typescript-bits.dev/",
+  "repository": "https://github.com/m10rten/typescript-bits",
+  "bugs": "https://github.com/m10rten/typescript-bits/issues",
   "packageManager": "pnpm@11.1.2",
+  "engines": {
+    "node": "^v24"
+  },
   "devDependencies": {
     "@changesets/cli": "2.31.0",
     "@types/node": "25.6.2",
+    "esbuild": "0.28.0",
     "husky": "9.1.7",
     "prettier": "3.8.3",
     "tsx": "4.22.3",
@@ -36,98 +48,99 @@
     "zshy": "0.7.2"
   },
   "files": [
-    "dist"
+    "dist",
+    "packages/*/dist"
   ],
-  "zshy": {
-    "bin": "./src/bin/cli/index.ts",
+  "bits": {
+    "bin": "./bin/cli.ts",
     "exports": {
-      "./atom": "./src/atom.ts",
-      "./json": "./src/json.ts",
-      "./reset/array": "./src/reset/array.ts",
-      "./reset/fetch": "./src/reset/fetch.ts",
-      "./reset/filter": "./src/reset/filter.ts",
-      "./reset/json": "./src/reset/json.ts",
-      "./reset/map": "./src/reset/map.ts",
-      "./reset/set": "./src/reset/set.ts",
-      "./reset": "./src/reset/index.ts",
-      "./queue": "./src/queue.ts",
-      "./result": "./src/result.ts",
-      "./retry": "./src/retry.ts",
-      "./safe": "./src/safe.ts",
-      "./types": "./src/types.ts"
+      "./atom": "./packages/atom/src/index.ts",
+      "./json": "./packages/json/src/index.ts",
+      "./reset/array": "./packages/reset/src/array.ts",
+      "./reset/fetch": "./packages/reset/src/fetch.ts",
+      "./reset/filter": "./packages/reset/src/filter.ts",
+      "./reset/json": "./packages/reset/src/json.ts",
+      "./reset/map": "./packages/reset/src/map.ts",
+      "./reset/set": "./packages/reset/src/set.ts",
+      "./reset": "./packages/reset/src/index.ts",
+      "./queue": "./packages/queue/src/index.ts",
+      "./result": "./packages/result/src/index.ts",
+      "./retry": "./packages/retry/src/index.ts",
+      "./safe": "./packages/safe/src/index.ts",
+      "./types": "./packages/types/src/index.ts"
     }
   },
   "exports": {
     "./atom": {
-      "types": "./dist/atom.d.cts",
-      "import": "./dist/atom.js",
-      "require": "./dist/atom.cjs"
+      "types": "./dist/atom/index.d.ts",
+      "import": "./dist/atom/index.js",
+      "require": "./dist/atom/index.cjs"
     },
     "./json": {
-      "types": "./dist/json.d.cts",
-      "import": "./dist/json.js",
-      "require": "./dist/json.cjs"
+      "types": "./dist/json/index.d.ts",
+      "import": "./dist/json/index.js",
+      "require": "./dist/json/index.cjs"
     },
     "./reset/array": {
-      "types": "./dist/reset/array.d.cts",
+      "types": "./dist/reset/array.d.ts",
       "import": "./dist/reset/array.js",
       "require": "./dist/reset/array.cjs"
     },
     "./reset/fetch": {
-      "types": "./dist/reset/fetch.d.cts",
+      "types": "./dist/reset/fetch.d.ts",
       "import": "./dist/reset/fetch.js",
       "require": "./dist/reset/fetch.cjs"
     },
     "./reset/filter": {
-      "types": "./dist/reset/filter.d.cts",
+      "types": "./dist/reset/filter.d.ts",
       "import": "./dist/reset/filter.js",
       "require": "./dist/reset/filter.cjs"
     },
     "./reset/json": {
-      "types": "./dist/reset/json.d.cts",
+      "types": "./dist/reset/json.d.ts",
       "import": "./dist/reset/json.js",
       "require": "./dist/reset/json.cjs"
     },
     "./reset/map": {
-      "types": "./dist/reset/map.d.cts",
+      "types": "./dist/reset/map.d.ts",
       "import": "./dist/reset/map.js",
       "require": "./dist/reset/map.cjs"
     },
     "./reset/set": {
-      "types": "./dist/reset/set.d.cts",
+      "types": "./dist/reset/set.d.ts",
       "import": "./dist/reset/set.js",
       "require": "./dist/reset/set.cjs"
     },
     "./reset": {
-      "types": "./dist/reset/index.d.cts",
+      "types": "./dist/reset/index.d.ts",
       "import": "./dist/reset/index.js",
       "require": "./dist/reset/index.cjs"
     },
     "./queue": {
-      "types": "./dist/queue.d.cts",
-      "import": "./dist/queue.js",
-      "require": "./dist/queue.cjs"
+      "types": "./dist/queue/index.d.ts",
+      "import": "./dist/queue/index.js",
+      "require": "./dist/queue/index.cjs"
     },
     "./result": {
-      "types": "./dist/result.d.cts",
-      "import": "./dist/result.js",
-      "require": "./dist/result.cjs"
+      "types": "./dist/result/index.d.ts",
+      "import": "./dist/result/index.js",
+      "require": "./dist/result/index.cjs"
     },
     "./retry": {
-      "types": "./dist/retry.d.cts",
-      "import": "./dist/retry.js",
-      "require": "./dist/retry.cjs"
+      "types": "./dist/retry/index.d.ts",
+      "import": "./dist/retry/index.js",
+      "require": "./dist/retry/index.cjs"
     },
     "./safe": {
-      "types": "./dist/safe.d.cts",
-      "import": "./dist/safe.js",
-      "require": "./dist/safe.cjs"
+      "types": "./dist/safe/index.d.ts",
+      "import": "./dist/safe/index.js",
+      "require": "./dist/safe/index.cjs"
     },
     "./types": {
-      "types": "./dist/types.d.cts",
-      "import": "./dist/types.js",
-      "require": "./dist/types.cjs"
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/types/index.js",
+      "require": "./dist/types/index.cjs"
     }
   },
-  "bin": "./dist/bin/cli/index.cjs"
+  "bin": "./dist/bin/cli.cjs"
 }

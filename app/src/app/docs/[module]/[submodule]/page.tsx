@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -13,6 +14,7 @@ import { Suspense } from "react";
 import {
   getModuleNames,
   getModuleContent,
+  getSubmoduleContent,
   highlightCode,
   addCodeAnchors,
   getImportCode,
@@ -22,6 +24,28 @@ import {
 } from "../../../../../scripts/source-files";
 import { ViewToggle } from "#/view-toggle";
 import { PageContent } from "#/page-content";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ module: string; submodule: string }>;
+}): Promise<Metadata> {
+  const { module: moduleName, submodule: submoduleName } = await params;
+  const parentModule = getModuleContent(moduleName);
+  const submodule = getSubmoduleContent(moduleName, submoduleName);
+  return {
+    title: `${moduleName}/${submoduleName} — typescript-bits`,
+    description: submodule.description,
+    openGraph: {
+      title: `${parentModule.displayName}: ${submoduleName}`,
+      description: submodule.description,
+    },
+    twitter: {
+      title: `${parentModule.displayName}: ${submoduleName}`,
+      description: submodule.description,
+    },
+  };
+}
 
 export function generateStaticParams() {
   const params: { module: string; submodule: string }[] = [];
@@ -41,7 +65,7 @@ export default async function SubmodulePage({ params }: { params: Promise<{ modu
   const modulePath = `${moduleName}/${submoduleName}`;
   let module;
   try {
-    module = getModuleContent(modulePath);
+    module = getSubmoduleContent(moduleName, submoduleName);
   } catch {
     notFound();
   }
@@ -57,6 +81,7 @@ export default async function SubmodulePage({ params }: { params: Promise<{ modu
   const totalLines = sourceLines.length;
   const displayLines =
     totalLines > MAX_SHOW ? Math.max(MIN_SHOW, Math.min(MAX_SHOW, totalLines - HIDE_OFFSET)) : totalLines;
+  const hiddenLines = totalLines - displayLines;
   const isSourceLong = totalLines > MAX_SHOW;
   const truncatedSource = isSourceLong ? sourceLines.slice(0, displayLines).join("\n") : module.sourceClean;
   const truncatedHtml = isSourceLong
@@ -113,7 +138,7 @@ export default async function SubmodulePage({ params }: { params: Promise<{ modu
       <div className="flex flex-wrap gap-2">
         {module.imports.length > 0 ? (
           module.imports.map((imp) => (
-            <Link key={imp} href={`/docs/${moduleName}/${imp.replace(/\.ts$/, "")}`}>
+            <Link key={imp} href={`/docs/${imp.replace(/\.ts$/, "")}`}>
               <Badge variant="outline" className="cursor-pointer hover:bg-muted transition-colors">
                 imports {imp}
               </Badge>
@@ -131,6 +156,7 @@ export default async function SubmodulePage({ params }: { params: Promise<{ modu
           sourceHtml={highlighted}
           sourceTruncatedHtml={truncatedHtml}
           sourceTotalLines={totalLines}
+          sourceHiddenLines={hiddenLines}
           sourceCode={module.sourceClean}
           sourceName={`${moduleName}/${submoduleName}`}
           importHtml={importHtml}

@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy } from "lucide-react";
+import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 import { copyToClipboard } from "~/utils";
 
@@ -24,8 +24,8 @@ export function CopyLine({ code, highlighted }: { code: string; highlighted: str
             setTimeout(() => setCopied(false), 2000);
           });
         }}>
-        <Copy className="size-3.5" />
-        {copied ? "Copied" : "Copy"}
+        {copied ? <Check className="size-3.5 text-green-400" /> : <Copy className="size-3.5" />}
+        <span className="hidden sm:inline">{copied ? "Copied" : "Copy"}</span>
       </button>
     </div>
   );

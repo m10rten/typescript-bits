@@ -3,63 +3,35 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { SearchIcon } from "lucide-react";
+import { usePlatform } from "$/use-platform";
+import { useKeyboardShortcut } from "$/use-keyboard-shortcut";
 import { Command as CommandPrimitive } from "cmdk";
 import { Dialog, DialogContent } from "#/ui/dialog";
 import { Command, CommandList, CommandEmpty, CommandGroup, CommandItem } from "#/ui/command";
 import { Spinner } from "#/ui/spinner";
 import type { SearchItemData } from "~/search-index";
 
-const QUESTIONS = [
-  "What is a Result?",
-  "How does the Queue work?",
-  "Chain operations with Retry",
-  "Type-safe event queues",
-  "Atom state management",
-  "Safe execution wrapper",
-  "Rich JSON serialization",
-  "Reset TypeScript types",
-  "Retry with exponential backoff",
-  "Handle errors safely",
-  "Reactive state atoms",
-  "Flexible concurrency control",
-  "Circuit breaker pattern",
-  "Deferred promises made easy",
-  "Countdown latches and barriers",
-];
-
 interface SearchProps {
   items: SearchItemData[];
+  questions: string[];
 }
 
-export function Search({ items }: SearchProps) {
+export function Search({ items, questions }: SearchProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState("");
   const [placeholder, setPlaceholder] = useState("Search docs...");
-  const [isMac, setIsMac] = useState<boolean | null>(null);
+  const { isMac } = usePlatform();
 
   // Pick a random placeholder on mount
   useEffect(() => {
-    setPlaceholder(QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)]!);
-  }, []);
+    if (questions.length > 0) {
+      setPlaceholder(questions[Math.floor(Math.random() * questions.length)]!);
+    }
+  }, [questions]);
 
-  // Detect platform for correct modifier key display
-  useEffect(() => {
-    setIsMac(navigator.platform.startsWith("Mac"));
-  }, []);
-
-  // Cmd+K / Ctrl+K to toggle
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        setOpen((prev) => !prev);
-      }
-    };
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, []);
+  useKeyboardShortcut("k", () => setOpen((prev) => !prev), { metaKey: true, ctrlKey: true });
 
   // Brief loading animation when dialog opens
   useEffect(() => {

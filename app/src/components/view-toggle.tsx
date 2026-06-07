@@ -3,6 +3,7 @@
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { cn } from "~/utils";
+import { useLocalStorage } from "$/use-local-storage";
 
 type View = "package" | "source-local" | "source-copy";
 
@@ -20,37 +21,35 @@ const VIEW_INDEX: Record<View, number> = {
   "source-copy": 2,
 };
 
-const STORAGE_KEY = "docs-view";
-
 export function ViewToggle() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const current: View = (searchParams.get("view") as View) ?? "package";
   const synced = useRef(false);
+  const [savedView, setSavedView] = useLocalStorage<View | null>("docs-view", null);
 
   // On mount, sync saved preference from localStorage to URL
   useEffect(() => {
     if (synced.current) return;
     synced.current = true;
 
-    const saved = localStorage.getItem(STORAGE_KEY) as View | null;
-    if (saved && saved !== current) {
+    if (savedView && savedView !== current) {
       const params = new URLSearchParams(searchParams.toString());
-      if (saved === "package") {
+      if (savedView === "package") {
         params.delete("view");
       } else {
-        params.set("view", saved);
+        params.set("view", savedView);
       }
       const qs = params.toString();
       router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-    } else if (!saved) {
-      localStorage.setItem(STORAGE_KEY, current);
+    } else if (!savedView) {
+      setSavedView(current);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   function setView(view: View) {
-    localStorage.setItem(STORAGE_KEY, view);
+    setSavedView(view);
     const params = new URLSearchParams(searchParams.toString());
     if (view === "package") {
       params.delete("view");

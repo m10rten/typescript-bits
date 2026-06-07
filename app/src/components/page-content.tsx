@@ -9,10 +9,12 @@ import { InstallDropdown } from "#/install-dropdown";
 interface PageContentProps {
   /** Pre-highlighted source HTML for "Copy Source" view (using clean source) */
   sourceHtml: string;
-  /** Pre-highlighted truncated source HTML (first 50 lines), for collapsed "Copy Source" view */
+  /** Pre-highlighted truncated source HTML, for collapsed "Copy Source" view */
   sourceTruncatedHtml?: string;
   /** Total number of lines in the source (used to show remaining count) */
   sourceTotalLines?: number;
+  /** Number of lines hidden in truncated view (for expand button text) */
+  sourceHiddenLines?: number;
   /** Clean raw source code (without @example blocks) */
   sourceCode: string;
   /** Display name shown in source block header (also used as module name for CLI commands) */
@@ -33,6 +35,7 @@ export function PageContent({
   sourceHtml,
   sourceTruncatedHtml,
   sourceTotalLines,
+  sourceHiddenLines,
   sourceCode,
   sourceName,
   importHtml,
@@ -49,6 +52,7 @@ export function PageContent({
       {/* "Install Package" — package manager install + submodule cards + usage */}
       {view === "package" && (
         <div className="flex flex-col gap-6">
+          <h2 className="text-xl font-semibold tracking-tight">Installation</h2>
           <InstallDropdown module={sourceName} mode="install" />
           {children}
           <UsageView importHtml={importHtml} examplesHtml={examplesHtml} />
@@ -58,6 +62,7 @@ export function PageContent({
       {/* "Install Source" — CLI source copy + usage */}
       {view === "source-local" && (
         <div className="flex flex-col gap-6">
+          <h2 className="text-xl font-semibold tracking-tight">Installation</h2>
           <InstallDropdown module={sourceName} mode="cli" />
           <UsageView importHtml={importLocalHtml} examplesHtml={examplesHtml} />
         </div>
@@ -67,10 +72,12 @@ export function PageContent({
       {view === "source-copy" && (
         <div className="flex flex-col gap-6">
           <UsageView examplesHtml={examplesLocalHtml ?? examplesHtml} />
+          <h2 className="text-xl font-semibold tracking-tight">Source</h2>
           <CodeBlock
             html={sourceHtml}
             truncatedHtml={sourceTruncatedHtml}
             totalLines={sourceTotalLines}
+            hiddenLines={sourceHiddenLines}
             source={sourceCode}
             displayName={sourceName}
           />

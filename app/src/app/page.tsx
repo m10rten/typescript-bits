@@ -1,9 +1,14 @@
 import Link from "next/link";
 import { Button } from "#/ui/button";
 import { GitBranch } from "lucide-react";
-import { getAllModules } from "../../scripts/source-files";
+import { getAllModules, type ModuleMeta } from "../../scripts/source-files";
 import { InstallHero } from "#/install-hero";
 import { ModuleCard } from "#/module-card";
+
+function buildHeroDescription(modules: ModuleMeta[]): string {
+  const names = modules.map((m) => m.displayName);
+  return `Production-ready TypeScript utility primitives. ${names.join(", ")} — zero-dependency, tree-shakeable, fully typed.`;
+}
 
 export default function Home() {
   const allModules = getAllModules();
@@ -35,8 +40,7 @@ export default function Home() {
               typescript-bits
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl text-balance">
-              Production-ready TypeScript utility primitives. Result, Atom, Queue, Safe, Retry, RichJSON, and reset
-              type modules — zero-dependency, tree-shakeable, fully typed.
+              {buildHeroDescription(allModules)}
             </p>
             <div className="flex flex-wrap gap-3 mt-2">
               <Button nativeButton={false} render={<Link href="/docs" />}>
@@ -67,7 +71,7 @@ export default function Home() {
               key={m.name}
               name={m.name}
               href={`/docs/${m.name}`}
-              deps={m.children ? undefined : m.imports.length}
+              deps={m.imports.length}
               submodules={m.children?.length}
               compact>
               {m.description}

@@ -1,8 +1,10 @@
 "use client";
 
 import { Button } from "#/ui/button";
-import { cn, copyToClipboard } from "~/utils";
+import { cn } from "~/utils";
+import { Check, Copy } from "lucide-react";
 import { useState } from "react";
+import { useCopyToClipboard } from "$/use-copy-to-clipboard";
 
 const PACKAGE_MANAGERS = ["npm", "pnpm", "bun", "deno"] as const;
 type PackageManager = (typeof PACKAGE_MANAGERS)[number];
@@ -31,7 +33,7 @@ const MODE_LABELS: Record<Mode, string> = {
 export function InstallCommand({ module }: { module?: string }) {
   const [pm, setPm] = useState<PackageManager>("npm");
   const [mode, setMode] = useState<Mode>(module ? "copy" : "install");
-  const [copied, setCopied] = useState(false);
+  const { copied, copy } = useCopyToClipboard();
 
   const command = mode === "install" ? INSTALL_COMMANDS[pm] : `${COPY_COMMANDS[pm]}${module ? ` ${module}` : ""}`;
 
@@ -78,20 +80,18 @@ export function InstallCommand({ module }: { module?: string }) {
         </div>
       </div>
       <div className="flex items-center gap-3 px-4 py-3">
-        <code className="flex-1 text-sm font-mono truncate select-all" style={{ fontVariantLigatures: "none" }}>
+        <code
+          className="flex-1 text-xs sm:text-sm font-mono truncate select-all"
+          style={{ fontVariantLigatures: "none" }}>
           $ {command}
         </code>
         <Button
           variant="outline"
           size="sm"
           aria-label={`Copy ${mode} command for ${pm}`}
-          onClick={() => {
-            copyToClipboard(command).then(() => {
-              setCopied(true);
-              setTimeout(() => setCopied(false), 2000);
-            });
-          }}>
-          {copied ? "Copied!" : "Copy"}
+          onClick={() => copy(command)}>
+          {copied ? <Check className="size-3.5 text-green-400 sm:hidden" /> : <Copy className="size-3.5 sm:hidden" />}
+          <span className="hidden sm:inline">{copied ? "Copied!" : "Copy"}</span>
         </Button>
       </div>
     </div>

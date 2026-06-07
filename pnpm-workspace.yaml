@@ -11,3 +11,4 @@ minimumReleaseAgeStrict: true
 packages:
   - .
   - app
+  - packages/*

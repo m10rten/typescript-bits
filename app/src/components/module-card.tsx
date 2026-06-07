@@ -23,12 +23,12 @@ export function ModuleCard({ name, href, children, deps, submodules, compact }: 
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <h3 className={compact ? "font-semibold text-sm" : "font-semibold"}>{name}</h3>
-            {deps !== undefined && (
+            {deps !== undefined && deps > 0 && (
               <span className="inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground/60 border-muted-foreground/20">
-                {deps > 0 ? `${deps} dep${deps !== 1 ? "s" : ""}` : "zero deps"}
+                {deps} link{deps !== 1 ? "s" : ""}
               </span>
             )}
-            {submodules !== undefined && (
+            {submodules !== undefined && submodules > 0 && (
               <span className="inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground/60 border-muted-foreground/20">
                 {submodules} submodule{submodules !== 1 ? "s" : ""}
               </span>

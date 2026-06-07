@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -9,7 +10,7 @@ import {
   BreadcrumbPage,
 } from "#/ui/breadcrumb";
 import { Badge } from "#/ui/badge";
-import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from "#/ui/card";
+import { SubmoduleCard } from "#/submodule-card";
 import { Suspense } from "react";
 import {
   getModuleNames,
@@ -23,6 +24,23 @@ import {
 } from "../../../../scripts/source-files";
 import { ViewToggle } from "#/view-toggle";
 import { PageContent } from "#/page-content";
+
+export async function generateMetadata({ params }: { params: Promise<{ module: string }> }): Promise<Metadata> {
+  const { module: moduleName } = await params;
+  const module = getModuleContent(moduleName);
+  return {
+    title: `${module.displayName} — typescript-bits`,
+    description: module.description,
+    openGraph: {
+      title: module.displayName,
+      description: module.description,
+    },
+    twitter: {
+      title: module.displayName,
+      description: module.description,
+    },
+  };
+}
 
 export function generateStaticParams() {
   return getModuleNames().map((name) => ({ module: name }));
@@ -48,6 +66,7 @@ export default async function ModulePage({ params }: { params: Promise<{ module:
   const totalLines = sourceLines.length;
   const displayLines =
     totalLines > MAX_SHOW ? Math.max(MIN_SHOW, Math.min(MAX_SHOW, totalLines - HIDE_OFFSET)) : totalLines;
+  const hiddenLines = totalLines - displayLines;
   const isSourceLong = totalLines > MAX_SHOW;
   const truncatedSource = isSourceLong ? sourceLines.slice(0, displayLines).join("\n") : module.sourceClean;
   const truncatedHtml = isSourceLong
@@ -109,52 +128,37 @@ export default async function ModulePage({ params }: { params: Promise<{ module:
         )}
       </div>
 
+      {/* Submodules — always visible, independent of view toggle */}
+      {module.children && module.children.length > 0 && (
+        <div className="flex flex-col gap-4">
+          <h2 className="text-xl font-semibold tracking-tight">Submodules</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {module.children.map((child) => (
+              <SubmoduleCard
+                key={child.name}
+                name={child.name}
+                moduleName={moduleName}
+                description={child.description}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Toggled content */}
       <Suspense fallback={<div className="text-muted-foreground text-sm">Loading…</div>}>
-        {module.children ? (
-          <PageContent
-            sourceHtml={highlighted}
-            sourceTruncatedHtml={truncatedHtml}
-            sourceTotalLines={totalLines}
-            sourceCode={module.sourceClean}
-            sourceName={module.name}
-            importHtml={importHtml}
-            importLocalHtml={importLocalHtml}
-            examplesHtml={examplesHtml}
-            examplesLocalHtml={examplesLocalHtml}>
-            {/* Submodule cards shown in "Install Package" view before examples */}
-            <div className="flex flex-col gap-4">
-              <h2 className="text-xl font-semibold tracking-tight">Submodules</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {module.children.map((child) => (
-                  <Link key={child.name} href={`/docs/${moduleName}/${child.name}`}>
-                    <Card className="h-full cursor-pointer hover:bg-muted transition-colors">
-                      <CardHeader>
-                        <CardTitle>{child.name}.ts</CardTitle>
-                        <CardDescription>{child.description}</CardDescription>
-                      </CardHeader>
-                      <CardFooter>
-                        <Badge variant="secondary">submodule</Badge>
-                      </CardFooter>
-                    </Card>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </PageContent>
-        ) : (
-          <PageContent
-            sourceHtml={highlighted}
-            sourceTruncatedHtml={truncatedHtml}
-            sourceTotalLines={totalLines}
-            sourceCode={module.sourceClean}
-            sourceName={module.name}
-            importHtml={importHtml}
-            importLocalHtml={importLocalHtml}
-            examplesHtml={examplesHtml}
-            examplesLocalHtml={examplesLocalHtml}
-          />
-        )}
+        <PageContent
+          sourceHtml={highlighted}
+          sourceTruncatedHtml={truncatedHtml}
+          sourceTotalLines={totalLines}
+          sourceHiddenLines={hiddenLines}
+          sourceCode={module.sourceClean}
+          sourceName={module.name}
+          importHtml={importHtml}
+          importLocalHtml={importLocalHtml}
+          examplesHtml={examplesHtml}
+          examplesLocalHtml={examplesLocalHtml}
+        />
       </Suspense>
     </div>
   );

@@ -62,12 +62,20 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  // Apply the security headers to all routes
   async headers() {
     return [
       {
         source: "/(.*)",
         headers: securityHeaders,
+      },
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800",
+          },
+        ],
       },
     ];
   },

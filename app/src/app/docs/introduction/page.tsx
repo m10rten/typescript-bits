@@ -1,16 +1,32 @@
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "#/ui/breadcrumb";
 import { ModuleCard } from "#/module-card";
+import { getAllModules } from "../../../../scripts/source-files";
 
-export const pageContent =
-  "A collection of production-ready TypeScript utility primitives — zero-dependency building blocks for everyday patterns. " +
-  "Design principles: Zero dependencies, Tree-shakeable by default, Strict TypeScript, Production first. " +
-  "Every module is a standalone .ts file you can import directly. No bundler magic, no barrel exports. " +
-  "Modules include: Atom reactive state with subscriptions, Result type-safe Ok/Err error handling, " +
-  "Queue event-driven queue with typed events, Safe wrap throwable functions returning a Result, " +
-  "Retry configurable retry with exponential backoff strategies, Rich JSON serialization for Dates Maps and Sets, " +
-  "Types utility types Enumerate and Range, Reset global type augmentations for Array.filter JSON.parse Set.";
+function buildModulesDescription(): string {
+  const modules = getAllModules();
+  return (
+    "Modules include: " +
+    modules
+      .map((m) => `${m.displayName} ${m.description.charAt(0).toLowerCase() + m.description.slice(1)}`)
+      .join(", ") +
+    "."
+  );
+}
+
+export function pageContent(): string {
+  const modules = getAllModules();
+  const moduleList = buildModulesDescription();
+  return (
+    "A collection of production-ready TypeScript utility primitives — zero-dependency building blocks for everyday patterns. " +
+    "Design principles: Zero dependencies, Tree-shakeable by default, Strict TypeScript, Production first. " +
+    "Every module is a standalone .ts file you can import directly. No bundler magic, no barrel exports. " +
+    moduleList
+  );
+}
 
 export default function IntroductionPage() {
+  const allModules = getAllModules();
+
   return (
     <div className="flex flex-col container-main py-8 gap-6">
       <Breadcrumb>
@@ -36,30 +52,16 @@ export default function IntroductionPage() {
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-          <ModuleCard name="Atom" href="/docs/atom" deps={0}>
-            Reactive state atom with subscriptions — lightweight signals for state management.
-          </ModuleCard>
-          <ModuleCard name="Result" href="/docs/result" deps={0}>
-            Type-safe Ok/Err discriminated union — explicit error handling without try/catch.
-          </ModuleCard>
-          <ModuleCard name="Queue" href="/docs/queue" deps={0}>
-            Event-driven queue with a typed event system — push, shift, and subscribe.
-          </ModuleCard>
-          <ModuleCard name="Safe" href="/docs/safe" deps={1}>
-            Wrap any throwable function and return a Result — no more uncaught exceptions.
-          </ModuleCard>
-          <ModuleCard name="Retry" href="/docs/retry" deps={2}>
-            Configurable retry with backoff strategies — exponential, linear, or custom.
-          </ModuleCard>
-          <ModuleCard name="Rich JSON" href="/docs/json" deps={0}>
-            Extended JSON serialization supporting Dates, Maps, Sets, and more.
-          </ModuleCard>
-          <ModuleCard name="Types" href="/docs/types" deps={0}>
-            Utility types like <code>Enumerate</code> and <code>Range</code> for numeric type gymnastics.
-          </ModuleCard>
-          <ModuleCard name="Reset" href="/docs/reset" submodules={6}>
-            Global type augmentations for better DX — Array.filter, JSON.parse, Set, etc.
-          </ModuleCard>
+          {allModules.map((m) => (
+            <ModuleCard
+              key={m.name}
+              name={m.displayName}
+              href={`/docs/${m.name}`}
+              deps={m.imports.length}
+              submodules={m.children?.length}>
+              {m.description}
+            </ModuleCard>
+          ))}
         </div>
 
         <h2 className="text-xl font-semibold mt-10">Design principles</h2>

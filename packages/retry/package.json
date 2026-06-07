@@ -1,0 +1,36 @@
+{
+  "name": "@typescript-bits/retry",
+  "version": "0.0.0",
+  "description": "Retry operations with configurable backoff",
+  "type": "module",
+  "scripts": {
+    "build": "zshy",
+    "test": "tsx --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "zshy": {
+    "exports": {
+      ".": "./src/index.ts"
+    }
+  },
+  "dependencies": {
+    "@typescript-bits/result": "workspace:*",
+    "@typescript-bits/safe": "workspace:*"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.cts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  }
+}

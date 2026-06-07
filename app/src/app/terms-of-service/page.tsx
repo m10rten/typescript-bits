@@ -20,7 +20,7 @@ export default function TosPage() {
       <article className="max-w-3xl space-y-8">
         <div className="space-y-2">
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Terms of Service</h1>
-          <p className="text-sm text-muted-foreground">Last updated: May 31, 2026</p>
+          <p className="text-sm text-muted-foreground">Last updated: June 7, 2026</p>
         </div>
 
         <section className="space-y-3">

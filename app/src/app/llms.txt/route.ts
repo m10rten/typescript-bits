@@ -1,5 +1,11 @@
 import { getAllModules } from "../../../scripts/source-files";
 
+function renderDescription(): string {
+  const modules = getAllModules();
+  const names = modules.map((m) => m.displayName);
+  return `Production-ready TypeScript utility primitives. ${names.join(", ")} — zero-dependency, tree-shakeable, fully typed.`;
+}
+
 function renderModules(): string {
   const modules = getAllModules();
   const lines: string[] = [];
@@ -20,7 +26,7 @@ function renderModules(): string {
 export function GET(): Response {
   const body = `# typescript-bits
 
-> Production-ready TypeScript utility primitives. Result, Atom, Queue, Safe, Retry, RichJSON, and type reset modules — zero-dependency, tree-shakeable, fully typed.
+> ${renderDescription()}
 
 ## Docs
 
@@ -39,6 +45,9 @@ ${renderModules()}
 `;
 
   return new Response(body, {
-    headers: { "Content-Type": "text/plain; charset=utf-8" },
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Cache-Control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800",
+    },
   });
 }

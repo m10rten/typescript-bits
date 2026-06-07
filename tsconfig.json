@@ -10,15 +10,6 @@
     "verbatimModuleSyntax": true,
     "esModuleInterop": true,
 
-    // === Output Settings ===
-    "outDir": "./dist",
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "inlineSources": false,
-    "removeComments": true,
-    "preserveWatchOutput": true,
-
     // === Strictness / Type Checking ===
     "strict": true,
     "strictNullChecks": true,
@@ -34,6 +25,5 @@
     "composite": false,
     "types": ["node"]
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts"],
   "exclude": ["node_modules", "dist", "examples", "poc"]
 }

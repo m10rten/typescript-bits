@@ -97,7 +97,7 @@ export function InstallHero({ modules = ["atom"] }: { modules?: string[] }) {
       {mode === "install" && (
         <div className="flex items-center justify-between px-5 py-4 gap-3">
           <code
-            className="flex-1 font-mono text-base select-all text-foreground truncate"
+            className="flex-1 font-mono text-sm sm:text-base select-all text-foreground truncate"
             style={{ fontVariantLigatures: "none" }}>
             $ {selectedInstall.command}
           </code>
@@ -109,11 +109,11 @@ export function InstallHero({ modules = ["atom"] }: { modules?: string[] }) {
       {mode === "source" && (
         <div className="flex items-center justify-between px-5 py-4 gap-3">
           <code
-            className="flex items-center gap-1 font-mono text-base select-all text-foreground min-w-0"
+            className="flex items-center gap-1 font-mono text-sm sm:text-base select-all text-foreground min-w-0"
             style={{ fontVariantLigatures: "none" }}>
             <span className="shrink-0">$ {selectedCli.command.split(" ").slice(0, -1).join(" ")}</span>
             {modules.length > 0 && (
-              <span className="inline-flex items-center rounded bg-muted px-1.5 py-0.5 text-base font-mono">
+              <span className="inline-flex items-center rounded bg-muted px-1.5 py-0.5 text-sm sm:text-base font-mono">
                 <select
                   value={cliModule}
                   onChange={(e) => setCliModule(e.target.value)}

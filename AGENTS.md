@@ -26,17 +26,27 @@ A collection of TypeScript utility primitives (Result, deferred, cache, queue, e
 ## Project Structure
 
 ```
-src/          # Library source code (rootDir for build)
-src/bin/      # CLI / binary tool source (not library modules)
-tests/        # Tests (colocated naming: <module>.test.ts)
-dist/         # Build output (generated, do not edit)
+packages/     # Monorepo packages (one per module)
+  atom/       # @typescript-bits/atom
+  json/       # @typescript-bits/json
+  queue/      # @typescript-bits/queue
+  reset/      # @typescript-bits/reset (subpath exports: array, fetch, filter, json, map, set)
+  result/     # @typescript-bits/result
+  retry/      # @typescript-bits/retry (depends on result, safe)
+  safe/       # @typescript-bits/safe (depends on result)
+  types/      # @typescript-bits/types
+app/          # Next.js demo app
+bin/cli.ts    # CLI binary (npx typescript-bits), not part of any library package
+  dist/         # Root-level build output (CLI + all packages compiled for umbrella `typescript-bits` entrypoints)
 docs/api/     # API documentation per module
 poc/          # Proof-of-concept / scratch code (excluded from build)
 ```
 
-> `src/bin/cli/` is the `npx typescript-bits` CLI. It is **not** a library module — exclude
-> it from any module-discovery or package-generation logic (the app's
-> `source-files.ts` already skips it).
+> Each package has its own `package.json`, `tsconfig.json`, `src/`, and `tests/`.
+> All packages are built with `zshy` via `pnpm -r --filter @typescript-bits/* build`.
+> Root `zshy` re-compiles all package sources into `dist/packages/<name>/src/` for the umbrella `typescript-bits` package (single installation, all modules).
+> Root `package.json` declares all `@typescript-bits/*` as `dependencies: workspace:*` so cross-package imports (`@typescript-bits/result` from `safe`) resolve from root `dist/` output.
+> Tests use `tsx` and live in each package's `tests/` directory.
 
 ---
 
@@ -51,10 +61,11 @@ poc/          # Proof-of-concept / scratch code (excluded from build)
 ### Commands
 
 ```
-pnpm build          # Build with zshy
+pnpm build          # Per-package builds → root zshy → app build
 pnpm typecheck      # Type-check only (tsc --noEmit)
 pnpm format         # Format all files with Prettier
 pnpm format:check   # Check formatting (pre-commit)
+pnpm test           # Run all tests via tsx
 ```
 
 ### Testing

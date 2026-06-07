@@ -7,12 +7,14 @@ export function CodeBlock({
   html,
   truncatedHtml,
   totalLines,
+  hiddenLines,
   source,
   displayName,
 }: {
   html: string;
   truncatedHtml?: string;
   totalLines?: number;
+  hiddenLines?: number;
   source: string;
   displayName: string;
 }) {
@@ -21,7 +23,7 @@ export function CodeBlock({
 
   const hasTruncation = truncatedHtml != null && totalLines != null && totalLines > 50;
   const displayHtml = hasTruncation && !expanded ? truncatedHtml : html;
-  const truncatedCount = totalLines ? totalLines - 50 : 0;
+  const truncatedCount = hiddenLines ?? (totalLines ? totalLines - 50 : 0);
 
   return (
     <div className="code-block relative rounded-lg border bg-zinc-950 overflow-hidden">

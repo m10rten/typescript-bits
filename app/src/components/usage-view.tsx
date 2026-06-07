@@ -8,6 +8,9 @@ export interface UsageViewProps {
 export function UsageView({ importHtml, examplesHtml }: UsageViewProps) {
   return (
     <div className="flex flex-col gap-6">
+      {/* Title only shown when there's content */}
+      {(importHtml || examplesHtml) && <h2 className="text-xl font-semibold tracking-tight">Usage</h2>}
+
       {/* Import statement — hidden for Copy Source view */}
       {importHtml && (
         <div className="rounded-lg border bg-zinc-950 overflow-hidden">

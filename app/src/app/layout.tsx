@@ -8,6 +8,7 @@ import { StickyHeader } from "#/sticky-header";
 import { BreadcrumbNav } from "#/breadcrumb-nav";
 import { ThemeProvider } from "#/theme-provider";
 import { getSearchIndex } from "~/search-index";
+import { getAllModules } from "../../scripts/source-files";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,30 +22,38 @@ const geistMono = Geist_Mono({
 
 const siteUrl = "https://typescript-bits.dev";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: "typescript-bits — TypeScript utility primitives",
-  description:
-    "Production-ready TypeScript utility primitives: Result, Atom, Queue, Safe, Retry, RichJSON, and reset type modules — zero-dependency, tree-shakeable, fully typed.",
-  icons: {
-    icon: "/favicon.svg",
-  },
-  openGraph: {
-    title: "typescript-bits",
-    description:
-      "Production-ready TypeScript utility primitives: Result, Atom, Queue, Safe, Retry, RichJSON, and reset type modules.",
-    url: siteUrl,
-    siteName: "typescript-bits",
-    type: "website",
-    locale: "en_US",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "typescript-bits",
-    description:
-      "Production-ready TypeScript utility primitives: Result, Atom, Queue, Safe, Retry, RichJSON, and reset type modules.",
-  },
-};
+function buildDescription(): string {
+  const modules = getAllModules();
+  const names = modules.map((m) => m.displayName);
+  return `Production-ready TypeScript utility primitives: ${names.join(
+    ", ",
+  )} — zero-dependency, tree-shakeable, fully typed.`;
+}
+
+export function generateMetadata(): Metadata {
+  const description = buildDescription();
+  return {
+    metadataBase: new URL(siteUrl),
+    title: "typescript-bits — TypeScript utility primitives",
+    description,
+    icons: {
+      icon: "/favicon.svg",
+    },
+    openGraph: {
+      title: "typescript-bits",
+      description,
+      url: siteUrl,
+      siteName: "typescript-bits",
+      type: "website",
+      locale: "en_US",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "typescript-bits",
+      description,
+    },
+  };
+}
 
 export default function RootLayout({
   children,
@@ -52,6 +61,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const searchItems = getSearchIndex();
+  const searchQuestions = getAllModules().flatMap((m) => [
+    `What is a ${m.displayName}?`,
+    `How does the ${m.displayName} work?`,
+  ]);
 
   return (
     <html
@@ -66,15 +79,13 @@ export default function RootLayout({
             className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-background focus:text-foreground focus:rounded-md focus:outline-ring">
             Skip to main content
           </a>
-          <StickyHeader searchItems={searchItems} />
+          <StickyHeader searchItems={searchItems} questions={searchQuestions} />
           <TooltipProvider>
             <main
               id="main-content"
               className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden scrollbar-gutter-stable">
-              <div className="flex-1">
-                <BreadcrumbNav />
-                {children}
-              </div>
+              <BreadcrumbNav />
+              {children}
               <footer className="border-t py-8 text-sm text-muted-foreground">
                 <div className="container-main flex flex-col gap-2">
                   <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1">

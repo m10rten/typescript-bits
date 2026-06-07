@@ -1,10 +1,10 @@
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { join, basename } from "node:path";
 import { createHighlighter, type Highlighter } from "shiki";
 
 // process.cwd() = app/ during `next build`
 // Turbopack ignore scopes the fs tracing to prevent NFT warnings
-const SRC_DIR = join(/*turbopackIgnore: true*/ process.cwd(), "../src");
+const PACKAGES_DIR = join(/*turbopackIgnore: true*/ process.cwd(), "..", "packages");
 
 export interface ModuleExport {
   name: string;
@@ -25,6 +25,7 @@ export interface ModuleExample {
 
 export interface ModuleMeta {
   name: string;
+  displayName: string;
   source: string;
   /** Source with @example JSDoc sections removed (for "Copy Source" view) */
   sourceClean: string;
@@ -40,6 +41,21 @@ export interface ModuleMeta {
   children?: ModuleChild[];
 }
 
+const MODULE_DISPLAY_NAMES: Record<string, string> = {
+  atom: "Atom",
+  json: "Rich JSON",
+  queue: "Queue",
+  reset: "Reset",
+  result: "Result",
+  retry: "Retry",
+  safe: "Safe",
+  types: "Types",
+};
+
+function getModuleDisplayName(name: string): string {
+  return MODULE_DISPLAY_NAMES[name] ?? name.charAt(0).toUpperCase() + name.slice(1);
+}
+
 const descriptionFallback: Record<string, string> = {
   atom: "Reactive state atom with subscriptions",
   json: "Rich JSON serialization with extended type support",
@@ -53,7 +69,9 @@ const descriptionFallback: Record<string, string> = {
 
 function extractImports(content: string): string[] {
   const imports: string[] = [];
-  const regex = /(?:import|export)\s+.*?from\s+["'](\.[^"']+)["']/g;
+  // Match only at line start (m flag) to avoid JSDoc examples;
+  // captures relative paths (./, ../) and internal @typescript-bits/ imports
+  const regex = /^\s*(?:import|export)\s+.*?from\s+["']((?:\.\.?\/[^"']*|@typescript-bits\/[^"']*))["']/gm;
   let match: RegExpExecArray | null;
   while ((match = regex.exec(content)) !== null) {
     imports.push(basename(match[1]!).replace(/\.js$/, ".ts"));
@@ -167,7 +185,7 @@ export function concatExampleCode(examples: ModuleExample[]): string {
  * code-fenced content that immediately precedes each export declaration.
  * Returns one entry per `@example` code block, keyed by export name.
  */
-function extractExamples(source: string, exports: ModuleExport[]): ModuleExample[] {
+function extractExamples(source: string, exports: ModuleExport[], fallbackName?: string): ModuleExample[] {
   const examples: ModuleExample[] = [];
   const exportLines = new Map(exports.map((e) => [e.line, e.name]));
   const lines = source.split("\n");
@@ -197,12 +215,12 @@ function extractExamples(source: string, exports: ModuleExport[]): ModuleExample
       }
 
       const exportLine = nextLine + 1; // convert to 1-indexed
-      const exportName = exportLines.get(exportLine);
+      const exampleName = exportLines.get(exportLine) ?? fallbackName;
 
-      if (exportName) {
+      if (exampleName) {
         const codes = extractExampleCode(jsdocLines.join("\n"));
         for (const code of codes) {
-          examples.push({ name: exportName, code });
+          examples.push({ name: exampleName, code });
         }
       }
     } else {
@@ -298,18 +316,14 @@ export function addCodeAnchors(html: string, exports: ModuleExport[]): string {
 
 export function getModuleNames(): string[] {
   const names: string[] = [];
-  const topEntries = readdirSync(SRC_DIR, { withFileTypes: true });
-  for (const entry of topEntries) {
-    if (entry.isFile() && entry.name.endsWith(".ts") && entry.name !== "index.ts") {
-      names.push(entry.name.replace(/\.ts$/, ""));
-    }
-    // Directories with index.ts are modules too (skip cli/ and _ prefixed dirs)
-    if (entry.isDirectory() && entry.name !== "cli" && !entry.name.startsWith("_")) {
-      const indexPath = join(SRC_DIR, entry.name, "index.ts");
+  const entries = readdirSync(PACKAGES_DIR, { withFileTypes: true });
+  for (const entry of entries) {
+    if (entry.isDirectory()) {
+      const srcIndex = join(PACKAGES_DIR, entry.name, "src", "index.ts");
       try {
-        if (readFileSync(indexPath, "utf-8")) names.push(entry.name);
+        if (readFileSync(srcIndex, "utf-8")) names.push(entry.name);
       } catch {
-        // no index.ts — not a module
+        // no src/index.ts — not a module
       }
     }
   }
@@ -317,7 +331,7 @@ export function getModuleNames(): string[] {
 }
 
 function scanChildren(modulePath: string): ModuleChild[] {
-  const dirPath = join(SRC_DIR, modulePath);
+  const dirPath = join(PACKAGES_DIR, modulePath, "src");
   try {
     return readdirSync(dirPath, { withFileTypes: true })
       .filter(
@@ -338,13 +352,7 @@ export function getModuleContent(modulePath: string): ModuleMeta {
   if (modulePath.startsWith("bin")) {
     throw new Error(`"${modulePath}" is not a library module`);
   }
-  // Try direct file first (atom.ts, result.ts), then directory/index.ts (reset/index.ts)
-  let filePath = join(SRC_DIR, `${modulePath}.ts`);
-  let isDir = false;
-  if (!existsSync(filePath)) {
-    filePath = join(SRC_DIR, modulePath, "index.ts");
-    isDir = true;
-  }
+  const filePath = join(PACKAGES_DIR, modulePath, "src", "index.ts");
   const source = readFileSync(filePath, "utf-8");
   const sourceClean = stripExampleBlocks(source);
   const imports = extractImports(source);
@@ -352,9 +360,10 @@ export function getModuleContent(modulePath: string): ModuleMeta {
   const exports = extractExports(source);
   const exportsClean = extractExports(sourceClean);
   const examples = extractExamples(source, exports);
-  const children = isDir ? scanChildren(modulePath) : undefined;
+  const children = scanChildren(modulePath);
   return {
     name: modulePath,
+    displayName: getModuleDisplayName(modulePath),
     source,
     sourceClean,
     imports,
@@ -364,6 +373,30 @@ export function getModuleContent(modulePath: string): ModuleMeta {
     importPath: `typescript-bits/${modulePath}`,
     examples,
     children,
+  };
+}
+
+export function getSubmoduleContent(moduleName: string, submoduleName: string): ModuleMeta {
+  const filePath = join(PACKAGES_DIR, moduleName, "src", `${submoduleName}.ts`);
+  const source = readFileSync(filePath, "utf-8");
+  const sourceClean = stripExampleBlocks(source);
+  const imports = extractImports(source);
+  const description = extractDescription(source, submoduleName);
+  const exports = extractExports(source);
+  const exportsClean = extractExports(sourceClean);
+  const examples = extractExamples(source, exports, submoduleName);
+  return {
+    name: `${moduleName}/${submoduleName}`,
+    displayName: submoduleName,
+    source,
+    sourceClean,
+    imports,
+    description,
+    exports,
+    exportsClean,
+    importPath: `typescript-bits/${moduleName}/${submoduleName}`,
+    examples,
+    children: [],
   };
 }
 

@@ -1,0 +1,39 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      day: "monday"
+      time: "07:00"
+      timezone: "Europe/London"
+    open-pull-requests-limit: 10
+    versioning-strategy: increase-if-necessary
+    cooldown:
+      default-days: 7
+    labels:
+      - "dependencies"
+    groups:
+      typescript-and-tools:
+        patterns:
+          - "typescript"
+          - "tsx"
+          - "zshy"
+          - "prettier"
+          - "husky"
+          - "@types/*"
+      changesets:
+        patterns:
+          - "@changesets/*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      day: "monday"
+      time: "07:00"
+      timezone: "Europe/London"
+    cooldown:
+      default-days: 7
+    labels:
+      - "dependencies"

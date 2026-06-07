@@ -1,5 +1,5 @@
 import { getAllModules } from "../../scripts/source-files";
-import { pageContent as introductionContent } from "../app/docs/introduction/page";
+import { pageContent as getIntroductionContent } from "../app/docs/introduction/page";
 import { pageContent as installationContent } from "../app/docs/installation/page";
 import { pageContent as tosContent } from "../app/terms-of-service/page";
 import { pageContent as contactContent } from "../app/contact/page";
@@ -65,7 +65,7 @@ export function getSearchIndex(): SearchItemData[] {
       id: "page-introduction",
       title: "Introduction",
       description: "Get started with typescript-bits",
-      content: introductionContent,
+      content: getIntroductionContent(),
       url: "/docs/introduction",
       category: "Page",
     },

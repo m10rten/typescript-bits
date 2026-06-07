@@ -5,7 +5,7 @@ import { Search } from "#/search";
 import { MobileNav } from "#/mobile-nav";
 import type { SearchItemData } from "~/search-index";
 
-export function StickyHeader({ searchItems }: { searchItems: SearchItemData[] }) {
+export function StickyHeader({ searchItems, questions }: { searchItems: SearchItemData[]; questions: string[] }) {
   return (
     <header className="z-50 border-b bg-background">
       <div className="flex h-14 items-center gap-2 sm:gap-4 lg:gap-6 px-4 sm:px-6 lg:px-8">
@@ -24,7 +24,7 @@ export function StickyHeader({ searchItems }: { searchItems: SearchItemData[] })
         </nav>
 
         <div className="flex-1 flex justify-center min-w-0">
-          <Search items={searchItems} />
+          <Search items={searchItems} questions={questions} />
         </div>
 
         {/* Desktop theme toggle */}
