@@ -7,6 +7,7 @@ import { TooltipProvider } from "#/ui/tooltip";
 import { StickyHeader } from "#/sticky-header";
 import { BreadcrumbNav } from "#/breadcrumb-nav";
 import { ThemeProvider } from "#/theme-provider";
+import { CookieBanner } from "#/cookie-banner";
 import { getSearchIndex } from "~/search-index";
 import { getAllModules } from "../../scripts/source-files";
 
@@ -38,6 +39,7 @@ export function generateMetadata(): Metadata {
     description,
     icons: {
       icon: "/favicon.svg",
+      apple: "/apple-icon.png",
     },
     openGraph: {
       title: "typescript-bits",
@@ -70,10 +72,29 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-      suppressContentEditableWarning={true}
       suppressHydrationWarning={true}>
       <body className="h-full flex flex-col overflow-hidden">
         <ThemeProvider>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                name: "typescript-bits",
+                url: siteUrl,
+                description: buildDescription(),
+                potentialAction: {
+                  "@type": "SearchAction",
+                  target: {
+                    "@type": "EntryPoint",
+                    urlTemplate: `${siteUrl}/?q={search_term_string}`,
+                  },
+                  "query-input": "required name=search_term_string",
+                },
+              }),
+            }}
+          />
           <a
             href="#main-content"
             className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-background focus:text-foreground focus:rounded-md focus:outline-ring">
@@ -117,6 +138,7 @@ export default function RootLayout({
               </footer>
             </main>
           </TooltipProvider>
+          <CookieBanner />
         </ThemeProvider>
       </body>
     </html>

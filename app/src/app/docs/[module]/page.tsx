@@ -22,8 +22,14 @@ import {
   concatExampleCode,
   transformImportsToLocal,
 } from "../../../../scripts/source-files";
-import { ViewToggle } from "#/view-toggle";
+import dynamic from "next/dynamic";
 import { PageContent } from "#/page-content";
+
+const ViewToggle = dynamic(() => import("#/view-toggle").then((mod) => mod.ViewToggle), {
+  loading: () => null,
+});
+
+const siteUrl = "https://typescript-bits.dev";
 
 export async function generateMetadata({ params }: { params: Promise<{ module: string }> }): Promise<Metadata> {
   const { module: moduleName } = await params;
@@ -91,6 +97,19 @@ export default async function ModulePage({ params }: { params: Promise<{ module:
 
   return (
     <div className="flex flex-col container-main py-8 gap-6">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "TechArticle",
+            "@id": `${siteUrl}/docs/${moduleName}`,
+            name: module.displayName,
+            description: module.description,
+            url: `${siteUrl}/docs/${moduleName}`,
+          }),
+        }}
+      />
       {/* Breadcrumbs + View Toggle */}
       <div className="flex items-center justify-between gap-4">
         <Breadcrumb>

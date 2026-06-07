@@ -16,8 +16,8 @@ export function ModuleCard({ name, href, children, deps, submodules, compact }: 
       href={href}
       className={
         compact
-          ? "group relative rounded-lg border border-border bg-background p-3 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-sm hover:border-primary/30"
-          : "group relative rounded-lg border border-border bg-background p-4 transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-md hover:border-primary/30"
+          ? "group relative rounded-lg border border-border bg-background p-3 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-sm hover:border-accent/30"
+          : "group relative rounded-lg border border-border bg-background p-4 transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-md hover:border-accent/30"
       }>
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
@@ -41,7 +41,7 @@ export function ModuleCard({ name, href, children, deps, submodules, compact }: 
             {children}
           </p>
         </div>
-        <span className="mt-0.5 shrink-0 text-muted-foreground/40 transition-all duration-200 group-hover:text-primary/70 group-hover:translate-x-0.5">
+        <span className="mt-0.5 shrink-0 text-muted-foreground/40 transition-all duration-200 group-hover:text-accent/70 group-hover:translate-x-0.5">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width={compact ? 12 : 14}

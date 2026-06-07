@@ -64,7 +64,7 @@ export function DocsSidebar({ allModules }: { allModules: ModuleMeta[] }) {
                       className={cn(
                         "block rounded px-2 py-1 text-sm transition-colors",
                         active
-                          ? "bg-muted font-medium text-foreground"
+                          ? "bg-accent/10 font-medium text-accent"
                           : "text-muted-foreground hover:bg-muted hover:text-foreground",
                       )}>
                       {item.label}
@@ -90,7 +90,7 @@ export function DocsSidebar({ allModules }: { allModules: ModuleMeta[] }) {
                       className={cn(
                         "block rounded px-2 py-1 text-sm transition-colors",
                         active || inSub
-                          ? "bg-muted font-medium text-foreground"
+                          ? "bg-accent/10 font-medium text-accent"
                           : "text-muted-foreground hover:bg-muted hover:text-foreground",
                       )}>
                       {m.name}
@@ -123,9 +123,7 @@ export function DocsSidebar({ allModules }: { allModules: ModuleMeta[] }) {
                                 onClick={() => setMobileOpen(false)}
                                 className={cn(
                                   "block truncate rounded px-2 py-0.5 text-xs transition-colors",
-                                  childActive
-                                    ? "text-foreground font-medium"
-                                    : "text-muted-foreground hover:text-foreground",
+                                  childActive ? "text-accent font-medium" : "text-muted-foreground hover:text-accent",
                                 )}>
                                 {child.name}
                               </Link>
