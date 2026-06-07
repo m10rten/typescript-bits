@@ -1,6 +1,6 @@
 {
   "name": "@typescript-bits/safe",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Safe execution wrapper returning Results",
   "type": "module",
   "scripts": {
