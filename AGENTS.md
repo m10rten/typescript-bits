@@ -61,7 +61,7 @@ poc/          # Proof-of-concept / scratch code (excluded from build)
 ### Commands
 
 ```
-pnpm build          # Per-package builds → root zshy → app build
+pnpm build          # Per-package builds → root umbrella build → app build
 pnpm typecheck      # Type-check only (tsc --noEmit)
 pnpm format         # Format all files with Prettier
 pnpm format:check   # Check formatting (pre-commit)
