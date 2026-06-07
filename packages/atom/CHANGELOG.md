@@ -1,4 +1,4 @@
-# Changelog
+# @typescript-bits/atom
 
 ## 0.1.0
 

@@ -1,4 +1,4 @@
-# Changelog
+# @typescript-bits/result
 
 ## 0.1.0
 

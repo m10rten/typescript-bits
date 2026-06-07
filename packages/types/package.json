@@ -1,6 +1,6 @@
 {
   "name": "@typescript-bits/types",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Utility types (Enumerate, Range)",
   "type": "module",
   "scripts": {
