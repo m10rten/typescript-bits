@@ -126,7 +126,7 @@ export default async function SubmodulePage({ params }: { params: Promise<{ modu
         }}
       />
       {/* Breadcrumbs + View Toggle */}
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>

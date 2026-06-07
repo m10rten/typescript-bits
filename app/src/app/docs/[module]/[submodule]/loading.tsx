@@ -4,7 +4,7 @@ export default function SubmoduleLoading() {
   return (
     <div className="flex flex-col container-main py-8 gap-6" role="status">
       {/* Breadcrumbs */}
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <Skeleton className="h-4 w-10" />
           <span className="text-muted-foreground text-sm">/</span>
