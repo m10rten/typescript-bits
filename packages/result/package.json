@@ -1,6 +1,6 @@
 {
   "name": "@typescript-bits/result",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A discriminated union for explicit success-or-failure",
   "type": "module",
   "scripts": {

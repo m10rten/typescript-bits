@@ -1,6 +1,6 @@
 {
   "name": "typescript-bits",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A collection of TypeScript utility primitives for Node.js",
   "type": "module",
   "scripts": {

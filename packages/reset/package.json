@@ -1,6 +1,6 @@
 {
   "name": "@typescript-bits/reset",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Global type augmentations for safer JavaScript built-ins",
   "type": "module",
   "scripts": {

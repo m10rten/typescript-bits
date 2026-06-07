@@ -1,4 +1,4 @@
-# Changelog
+# @typescript-bits/json
 
 ## 0.1.0
 

@@ -1,4 +1,4 @@
-# Changelog
+# @typescript-bits/queue
 
 ## 0.1.0
 
