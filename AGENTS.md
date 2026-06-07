@@ -1,4 +1,4 @@
-# AGENTS.md — typescript-bits
+# AGENTS.md - typescript-bits
 
 ## Project Overview
 
