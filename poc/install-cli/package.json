@@ -1,9 +1,0 @@
-{
-  "name": "@poc/install-cli",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "install-utils": "tsx install-cli.ts"
-  }
-}
