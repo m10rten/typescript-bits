@@ -40,13 +40,13 @@ jobs:
       - name: Check Code Formatting
         run: pnpm run format:check
 
-      # 2. Typecheck
-      - name: Run TypeScript Type Check
-        run: pnpm run typecheck
-
-      # 3. Build the project
+      # 2. Build the project (needed before typecheck so cross-package dist/ types exist)
       - name: Build Project
         run: pnpm run build
+
+      # 3. Typecheck
+      - name: Run TypeScript Type Check
+        run: pnpm run typecheck
 
       # 4. Run Tests
       - name: Run Unit and Integration Tests

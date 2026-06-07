@@ -4,6 +4,8 @@
   "description": "A collection of TypeScript utility primitives for Node.js",
   "type": "module",
   "scripts": {
+    "clean": "tsx scripts/clean.ts",
+    "reset": "pnpm clean && pnpm install && pnpm build",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky",
