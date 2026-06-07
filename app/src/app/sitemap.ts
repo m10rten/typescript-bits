@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getAllModules } from "../../scripts/source-files";
 
-const SITE_URL = process.env.SITE_URL ?? "https://typescript-bits.dev";
+const SITE_URL = process.env.SITE_URL ?? "https://ts.mvdlei.nl";
 
 const staticRoutes: MetadataRoute.Sitemap = [
   { url: SITE_URL, changeFrequency: "monthly", priority: 1 },

@@ -21,7 +21,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl = "https://typescript-bits.dev";
+const siteUrl = "https://ts.mvdlei.nl";
 
 function buildDescription(): string {
   const modules = getAllModules();

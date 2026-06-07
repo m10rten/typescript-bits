@@ -32,7 +32,7 @@
   ],
   "author": "m10rten",
   "license": "MIT",
-  "homepage": "https://typescript-bits.dev/",
+  "homepage": "https://ts.mvdlei.nl/",
   "repository": "https://github.com/m10rten/typescript-bits",
   "bugs": "https://github.com/m10rten/typescript-bits/issues",
   "packageManager": "pnpm@11.1.2",

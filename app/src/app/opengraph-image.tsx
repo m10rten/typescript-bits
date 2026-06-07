@@ -55,7 +55,7 @@ export default async function Image() {
           marginTop: 60,
           letterSpacing: "0.5px",
         }}>
-        typescript-bits.dev
+        ts.mvdlei.nl
       </div>
     </div>,
     { ...size },

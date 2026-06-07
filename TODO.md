@@ -2,4 +2,4 @@
 
 ## Domain
 
-- [ ] **Confirm the production domain.** Currently `https://typescript-bits.dev` used as hardcoded fallback. Is this correct?
+- [ ] **Confirm the production domain.** Ensure the `SITE_URL` fallback is set to the correct domain before deploying.

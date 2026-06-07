@@ -29,7 +29,7 @@ const ViewToggle = dynamic(() => import("#/view-toggle").then((mod) => mod.ViewT
   loading: () => null,
 });
 
-const siteUrl = "https://typescript-bits.dev";
+const siteUrl = "https://ts.mvdlei.nl";
 
 export async function generateMetadata({ params }: { params: Promise<{ module: string }> }): Promise<Metadata> {
   const { module: moduleName } = await params;

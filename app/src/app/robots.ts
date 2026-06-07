@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const SITE_URL = process.env.SITE_URL ?? "https://typescript-bits.dev";
+const SITE_URL = process.env.SITE_URL ?? "https://ts.mvdlei.nl";
 
 export default function robots(): MetadataRoute.Robots {
   return {
