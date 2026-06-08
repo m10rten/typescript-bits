@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "#/ui/breadcrumb";
-import { ModuleCard } from "#/module-card";
-import { getAllModules } from "../../../../scripts/source-files";
+import { Badge } from "#/ui/badge";
+import { Card } from "#/card";
+import { getAllModules, getAllSkills } from "../../../../scripts/source-files";
 
 function buildModulesDescription(): string {
   const modules = getAllModules();
@@ -14,18 +16,24 @@ function buildModulesDescription(): string {
 }
 
 export function pageContent(): string {
-  const modules = getAllModules();
+  const skills = getAllSkills();
   const moduleList = buildModulesDescription();
+  const skillList =
+    skills.length > 0
+      ? " Agent skills: " + skills.map((s) => `${s.displayName} — ${s.description}`).join(", ") + "."
+      : "";
   return (
     "A collection of production-ready TypeScript utility primitives — zero-dependency building blocks for everyday patterns. " +
     "Design principles: Zero dependencies, Tree-shakeable by default, Strict TypeScript, Production first. " +
     "Every module is a standalone .ts file you can import directly. No bundler magic, no barrel exports. " +
-    moduleList
+    moduleList +
+    skillList
   );
 }
 
 export default function IntroductionPage() {
   const allModules = getAllModules();
+  const allSkills = getAllSkills();
 
   return (
     <div className="flex flex-col container-main py-8 gap-6">
@@ -53,16 +61,54 @@ export default function IntroductionPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
           {allModules.map((m) => (
-            <ModuleCard
+            <Card
               key={m.name}
-              name={m.displayName}
+              title={m.displayName}
               href={`/docs/${m.name}`}
-              deps={m.imports.length}
-              submodules={m.children?.length}>
+              badges={
+                <>
+                  {m.imports.length > 0 && (
+                    <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                      {m.imports.length} dep{m.imports.length !== 1 ? "s" : ""}
+                    </Badge>
+                  )}
+                  {m.children && m.children.length > 0 && (
+                    <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                      {m.children.length} sub
+                    </Badge>
+                  )}
+                </>
+              }>
               {m.description}
-            </ModuleCard>
+            </Card>
           ))}
         </div>
+
+        {allSkills.length > 0 && (
+          <>
+            <h2 className="text-xl font-semibold mt-10">Agent skills</h2>
+            <p>
+              Reusable instructions that extend AI coding agents with project-specific knowledge. Compatible with
+              OpenCode, Codex, Claude Code, and 50+ other agents.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+              {allSkills.map((s) => (
+                <Card key={s.name} title={s.displayName} href={`/docs/skills/${s.name}`} size="sm">
+                  {s.description}
+                </Card>
+              ))}
+            </div>
+            <p className="text-sm text-muted-foreground mt-4">
+              See all skills on the{" "}
+              <Link
+                href="/docs/skills"
+                className="underline underline-offset-2 hover:text-foreground transition-colors">
+                Skills overview page
+              </Link>
+              .
+            </p>
+          </>
+        )}
 
         <h2 className="text-xl font-semibold mt-10">Design principles</h2>
         <ul className="space-y-2 list-disc pl-5">

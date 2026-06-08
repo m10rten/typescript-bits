@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getAllModules } from "../../scripts/source-files";
+import { getAllModules, getAllSkills } from "../../scripts/source-files";
 
 const SITE_URL = process.env.SITE_URL ?? "https://ts.mvdlei.nl";
 
@@ -19,6 +19,7 @@ const metadataRoutes: MetadataRoute.Sitemap = [
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const modules = getAllModules();
+  const skills = getAllSkills();
 
   const moduleRoutes: MetadataRoute.Sitemap = modules.flatMap((mod) => {
     const routes: MetadataRoute.Sitemap = [
@@ -38,5 +39,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     return routes;
   });
 
-  return [...staticRoutes, ...moduleRoutes, ...metadataRoutes];
+  const skillRoutes: MetadataRoute.Sitemap = skills.map((skill) => ({
+    url: `${SITE_URL}/docs/skills/${skill.name}`,
+    changeFrequency: "monthly",
+    priority: 0.5,
+  }));
+
+  return [...staticRoutes, ...moduleRoutes, ...skillRoutes, ...metadataRoutes];
 }

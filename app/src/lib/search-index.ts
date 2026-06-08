@@ -1,4 +1,4 @@
-import { getAllModules } from "../../scripts/source-files";
+import { getAllModules, getAllSkills } from "../../scripts/source-files";
 import { pageContent as getIntroductionContent } from "../app/docs/introduction/page";
 import { pageContent as installationContent } from "../app/docs/installation/page";
 import { pageContent as tosContent } from "../app/terms-of-service/page";
@@ -10,18 +10,19 @@ export interface SearchItemData {
   description: string;
   content: string;
   url: string;
-  category: "Module" | "Submodule" | "Export" | "Page";
+  category: "Module" | "Submodule" | "Export" | "Page" | "Skill";
 }
 
 export function getSearchIndex(): SearchItemData[] {
   const items: SearchItemData[] = [];
   const modules = getAllModules();
+  const skills = getAllSkills();
 
   for (const mod of modules) {
     items.push({
       id: `module-${mod.name}`,
       title: mod.name,
-      description: mod.description,
+      description: `Modules — ${mod.description}`,
       content: mod.sourceClean,
       url: `/docs/${mod.name}`,
       category: "Module",
@@ -39,7 +40,7 @@ export function getSearchIndex(): SearchItemData[] {
       items.push({
         id: `exp-${mod.name}-${exp.name}`,
         title: exp.name,
-        description: `export from ${mod.name}`,
+        description: `Exports — ${exp.name} from ${mod.name}`,
         content: context,
         url: `/docs/${mod.name}#${exp.name}`,
         category: "Export",
@@ -51,7 +52,7 @@ export function getSearchIndex(): SearchItemData[] {
         items.push({
           id: `sub-${mod.name}-${child.name}`,
           title: `${mod.name}/${child.name}`,
-          description: child.description,
+          description: `Submodules — ${child.description}`,
           content: "",
           url: `/docs/${mod.name}/${child.name}`,
           category: "Submodule",
@@ -60,11 +61,23 @@ export function getSearchIndex(): SearchItemData[] {
     }
   }
 
+  // Skills entries
+  for (const skill of skills) {
+    items.push({
+      id: `skill-${skill.name}`,
+      title: skill.displayName,
+      description: `Skills — ${skill.description}`,
+      content: skill.content,
+      url: `/docs/skills/${skill.name}`,
+      category: "Skill",
+    });
+  }
+
   items.push(
     {
       id: "page-introduction",
       title: "Introduction",
-      description: "Get started with typescript-bits",
+      description: "Pages — Get started with typescript-bits",
       content: getIntroductionContent(),
       url: "/docs/introduction",
       category: "Page",
@@ -72,7 +85,7 @@ export function getSearchIndex(): SearchItemData[] {
     {
       id: "page-installation",
       title: "Installation",
-      description: "Install and setup typescript-bits",
+      description: "Pages — Install and setup typescript-bits",
       content: installationContent,
       url: "/docs/installation",
       category: "Page",
@@ -80,7 +93,7 @@ export function getSearchIndex(): SearchItemData[] {
     {
       id: "page-terms-of-service",
       title: "Terms of Service",
-      description: "Terms of Service for the typescript-bits website",
+      description: "Pages — Terms of Service for the typescript-bits website",
       content: tosContent,
       url: "/terms-of-service",
       category: "Page",
@@ -88,7 +101,7 @@ export function getSearchIndex(): SearchItemData[] {
     {
       id: "page-contact",
       title: "Contact",
-      description: "Get in touch with the typescript-bits team",
+      description: "Pages — Get in touch with the typescript-bits team",
       content: contactContent,
       url: "/contact",
       category: "Page",

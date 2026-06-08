@@ -5,13 +5,13 @@ import { CodeCopyButton } from "#/copy-button";
 
 type Entry = { id: string; label: string; command: string };
 
-const INSTALL_ENTRIES: Entry[] = [
+const INSTALL_ENTRIES = [
   { id: "pnpm", label: "pnpm", command: "pnpm add typescript-bits" },
   { id: "bun", label: "bun", command: "bun add typescript-bits" },
   { id: "npm", label: "npm", command: "npm install typescript-bits" },
   { id: "yarn", label: "yarn", command: "yarn add typescript-bits" },
   { id: "deno", label: "deno", command: "deno add npm:typescript-bits" },
-];
+] as const satisfies Entry[];
 
 /** Scoped install commands (e.g. @typescript-bits/result). */
 function scopedEntries(module: string): Entry[] {
@@ -50,9 +50,9 @@ export function InstallDropdown({
   // For submodules (e.g. "reset/array"), use the top-level module for the scoped package
   const scopedModule = moduleName?.split("/")[0] ?? "";
   const scopedOptions = scopedModule ? scopedEntries(scopedModule) : [];
-  const selectedScoped = scopedOptions.find((e) => e.id === scopedPm) ?? scopedOptions[0];
+  const selectedScoped = scopedOptions.find((e) => e.id === scopedPm) ?? scopedOptions[0]!;
   const cliOptions = moduleName ? cliEntries(moduleName) : [];
-  const selectedCli = cliOptions.find((e) => e.id === cliPm) ?? cliOptions[0];
+  const selectedCli = cliOptions.find((e) => e.id === cliPm) ?? cliOptions[0]!;
 
   const showInstall = !mode || mode === "install";
   const showCli = moduleName && (!mode || mode === "cli");

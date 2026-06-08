@@ -24,6 +24,7 @@ import {
 } from "../../../../../scripts/source-files";
 import dynamic from "next/dynamic";
 import { PageContent } from "#/page-content";
+import { ScrollProgress } from "#/scroll-progress";
 
 const ViewToggle = dynamic(() => import("#/view-toggle").then((mod) => mod.ViewToggle), {
   loading: () => null,
@@ -111,79 +112,82 @@ export default async function SubmodulePage({ params }: { params: Promise<{ modu
   const examplesLocalHtml = combinedLocalCode ? addCodeAnchors(await highlightCode(combinedLocalCode), []) : "";
 
   return (
-    <div className="flex flex-col container-main py-8 gap-6">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "TechArticle",
-            "@id": `${siteUrl}/docs/${moduleName}/${submoduleName}`,
-            name: `${moduleName}/${submoduleName}`,
-            description: module.description,
-            url: `${siteUrl}/docs/${moduleName}/${submoduleName}`,
-          }),
-        }}
-      />
-      {/* Breadcrumbs + View Toggle */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/docs">Docs</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href={`/docs/${moduleName}`}>{moduleName}</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>{submoduleName}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-        <Suspense>
-          <ViewToggle />
+    <>
+      <ScrollProgress />
+      <div className="flex flex-col container-main py-8 gap-6">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "TechArticle",
+              "@id": `${siteUrl}/docs/${moduleName}/${submoduleName}`,
+              name: `${moduleName}/${submoduleName}`,
+              description: module.description,
+              url: `${siteUrl}/docs/${moduleName}/${submoduleName}`,
+            }),
+          }}
+        />
+        {/* Breadcrumbs + View Toggle */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/docs">Docs</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href={`/docs/${moduleName}`}>{moduleName}</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{submoduleName}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+          <Suspense>
+            <ViewToggle />
+          </Suspense>
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <h1 className="text-3xl font-bold tracking-tight">
+            {moduleName}/{submoduleName}.ts
+          </h1>
+          <p className="text-muted-foreground">{module.description}</p>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {module.imports.length > 0 ? (
+            module.imports.map((imp) => (
+              <Link key={imp} href={`/docs/${imp.replace(/\.ts$/, "")}`}>
+                <Badge variant="outline" className="cursor-pointer hover:bg-muted transition-colors">
+                  imports {imp}
+                </Badge>
+              </Link>
+            ))
+          ) : (
+            <Badge variant="ghost">zero dependencies</Badge>
+          )}
+          <Badge variant="secondary">submodule of {moduleName}</Badge>
+        </div>
+
+        {/* Toggled content */}
+        <Suspense fallback={<div className="text-muted-foreground text-sm">Loading…</div>}>
+          <PageContent
+            sourceHtml={highlighted}
+            sourceTruncatedHtml={truncatedHtml}
+            sourceTotalLines={totalLines}
+            sourceHiddenLines={hiddenLines}
+            sourceCode={module.sourceClean}
+            sourceName={`${moduleName}/${submoduleName}`}
+            importHtml={importHtml}
+            importLocalHtml={importLocalHtml}
+            examplesHtml={examplesHtml}
+            examplesLocalHtml={examplesLocalHtml}
+          />
         </Suspense>
       </div>
-
-      <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold tracking-tight">
-          {moduleName}/{submoduleName}.ts
-        </h1>
-        <p className="text-muted-foreground">{module.description}</p>
-      </div>
-
-      <div className="flex flex-wrap gap-2">
-        {module.imports.length > 0 ? (
-          module.imports.map((imp) => (
-            <Link key={imp} href={`/docs/${imp.replace(/\.ts$/, "")}`}>
-              <Badge variant="outline" className="cursor-pointer hover:bg-muted transition-colors">
-                imports {imp}
-              </Badge>
-            </Link>
-          ))
-        ) : (
-          <Badge variant="ghost">zero dependencies</Badge>
-        )}
-        <Badge variant="secondary">submodule of {moduleName}</Badge>
-      </div>
-
-      {/* Toggled content */}
-      <Suspense fallback={<div className="text-muted-foreground text-sm">Loading…</div>}>
-        <PageContent
-          sourceHtml={highlighted}
-          sourceTruncatedHtml={truncatedHtml}
-          sourceTotalLines={totalLines}
-          sourceHiddenLines={hiddenLines}
-          sourceCode={module.sourceClean}
-          sourceName={`${moduleName}/${submoduleName}`}
-          importHtml={importHtml}
-          importLocalHtml={importLocalHtml}
-          examplesHtml={examplesHtml}
-          examplesLocalHtml={examplesLocalHtml}
-        />
-      </Suspense>
-    </div>
+    </>
   );
 }

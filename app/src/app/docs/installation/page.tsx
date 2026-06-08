@@ -7,6 +7,7 @@ import {
   BreadcrumbPage,
 } from "#/ui/breadcrumb";
 import { InstallDropdown } from "#/install-dropdown";
+import { CommandLine } from "#/command-line";
 import { highlightCode } from "../../../../scripts/source-files";
 import Link from "next/link";
 import { CopyLine } from "./copy-line";
@@ -15,6 +16,7 @@ export const pageContent =
   "Three ways to use a module: Install Package via npm yarn pnpm bun from node_modules. " +
   "Install Source via CLI — copy into project as editable source file, dependencies resolved automatically. " +
   "Copy Source — navigate to module page, switch to Copy Source view, and copy highlighted code directly. " +
+  "Agent skills install via npx skills add m10rten/typescript-bits. " +
   "ESM only — published as a native ES module package. Node.js 22+ required. TypeScript 5.7+. " +
   "No bundler required — works with Node Bun Deno and all major bundlers. " +
   "Source fetched from GitHub — CLI fetches module sources at runtime. " +
@@ -104,6 +106,36 @@ export default async function InstallationPage() {
           code={`const ok = Result.ok(10);\nconsole.log(ok.value); // 10`}
           highlighted={await highlightCode(`const ok = Result.ok(10);\nconsole.log(ok.value); // 10`, "ts")}
         />
+      </div>
+
+      {/* Skills */}
+      <div className="flex flex-col gap-3">
+        <h2 className="text-xl font-semibold tracking-tight">Skills</h2>
+        <p className="text-sm text-muted-foreground">
+          Agent skills extend AI coding agents (OpenCode, Codex, Claude Code, and 50+ others) with project-specific
+          knowledge. Install via the skills CLI:
+        </p>
+        <div className="max-w-md">
+          <div className="rounded-lg border bg-card text-card-foreground">
+            <div className="border-b px-4 py-2 text-xs font-medium text-muted-foreground">Install</div>
+            <div className="px-4 py-3">
+              <CommandLine command="npx skills add m10rten/typescript-bits" label="npx" />
+            </div>
+          </div>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          This installs all available skills. To install a single skill, append{" "}
+          <code className="text-xs font-mono">--skill &lt;skill-name&gt;</code>. See all skills on the{" "}
+          <Link href="/docs/skills" className="underline underline-offset-2 hover:text-foreground transition-colors">
+            Skills overview page
+          </Link>
+          .
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Skills are auto-discovered from the <code className="text-xs font-mono">skills/</code> directory — no
+          configuration needed. Each skill is a <code className="text-xs font-mono">SKILL.md</code> file with YAML
+          frontmatter.
+        </p>
       </div>
 
       {/* Package details */}

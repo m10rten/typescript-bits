@@ -10,6 +10,7 @@ import { ThemeProvider } from "#/theme-provider";
 import { CookieBanner } from "#/cookie-banner";
 import { getSearchIndex } from "~/search-index";
 import { getAllModules } from "../../scripts/source-files";
+import ExternalLink from "#/external-link";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -115,13 +116,11 @@ export default function RootLayout({
                       <span className="text-xs border rounded px-1.5 py-0.5">MIT</span>
                     </div>
                     <nav className="flex flex-col items-end gap-1" aria-label="Footer">
-                      <a
+                      <ExternalLink
                         href="https://github.com/m10rten"
-                        target="_blank"
-                        rel="noopener noreferrer"
                         className="underline underline-offset-2 hover:text-foreground transition-colors">
                         m10rten ↗
-                      </a>
+                      </ExternalLink>
                       <a href="/contact" title="Contact" className="hover:text-foreground transition-colors">
                         Contact
                       </a>

@@ -125,6 +125,9 @@ dist
 # TernJS port file
 .tern-port
 
+# Agent skills — installed by `npx skills add`, source is in skills/
+skills-lock.json
+
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 

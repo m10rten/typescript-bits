@@ -4,14 +4,46 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "~/utils";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
-import type { ModuleMeta } from "../../scripts/source-files";
+import { Menu, X, ChevronDownIcon, ChevronUpIcon } from "lucide-react";
+import type { ModuleMeta, SkillMeta } from "../../scripts/source-files";
 
-export function DocsSidebar({ allModules }: { allModules: ModuleMeta[] }) {
+function CollapsibleHeader({
+  label,
+  href,
+  isOpen,
+  onToggle,
+}: {
+  label: string;
+  href: string;
+  isOpen: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <div className="flex items-center justify-between mb-2">
+      <Link
+        href={href}
+        className="text-xs font-semibold text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors">
+        {label}
+      </Link>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-label={isOpen ? `Collapse ${label}` : `Expand ${label}`}
+        aria-expanded={isOpen}
+        className="inline-flex items-center justify-center size-5 rounded text-muted-foreground/40 hover:text-foreground hover:bg-muted transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50">
+        {isOpen ? <ChevronUpIcon className="size-3.5" /> : <ChevronDownIcon className="size-3.5" />}
+      </button>
+    </div>
+  );
+}
+
+export function DocsSidebar({ allModules, allSkills }: { allModules: ModuleMeta[]; allSkills: SkillMeta[] }) {
   const pathname = usePathname();
   const currentModule = pathname.startsWith("/docs/") ? pathname.replace("/docs/", "") : null;
-  const currentData = currentModule ? (allModules.find((m) => m.name === currentModule) ?? null) : null;
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [gettingStartedOpen, setGettingStartedOpen] = useState(true);
+  const [modulesOpen, setModulesOpen] = useState(true);
+  const [skillsOpen, setSkillsOpen] = useState(true);
 
   return (
     <>
@@ -46,96 +78,145 @@ export function DocsSidebar({ allModules }: { allModules: ModuleMeta[] }) {
         )}>
         <nav className="flex-1 space-y-6 p-4" aria-label="Documentation sidebar">
           {/* Getting Started */}
-          <div className="sticky top-0 bg-background z-10 border-b border-border pb-3">
-            <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-              Getting Started
-            </h2>
-            <ul className="space-y-1">
-              {[
-                { label: "Introduction", href: "/docs/introduction" },
-                { label: "Installation", href: "/docs/installation" },
-              ].map((item) => {
-                const active = pathname === item.href;
-                return (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      onClick={() => setMobileOpen(false)}
-                      className={cn(
-                        "block rounded px-2 py-1 text-sm transition-colors",
-                        active
-                          ? "bg-accent/10 font-medium text-accent"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                      )}>
-                      {item.label}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
+          <div>
+            <CollapsibleHeader
+              label="Getting Started"
+              href="/docs/introduction"
+              isOpen={gettingStartedOpen}
+              onToggle={() => setGettingStartedOpen((v) => !v)}
+            />
+            {gettingStartedOpen && (
+              <ul className="space-y-1">
+                {[
+                  { label: "Introduction", href: "/docs/introduction" },
+                  { label: "Installation", href: "/docs/installation" },
+                ].map((item) => {
+                  const active = pathname === item.href;
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        onClick={() => setMobileOpen(false)}
+                        className={cn(
+                          "block rounded px-2 py-1 text-sm transition-colors",
+                          active
+                            ? "bg-accent/10 font-medium text-accent"
+                            : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                        )}>
+                        {item.label}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
+
+          {/* Skills */}
+          {allSkills.length > 0 && (
+            <div>
+              <CollapsibleHeader
+                label="Skills"
+                href="/docs/skills"
+                isOpen={skillsOpen}
+                onToggle={() => setSkillsOpen((v) => !v)}
+              />
+              {skillsOpen && (
+                <ul className="space-y-1">
+                  {allSkills.map((skill) => {
+                    const skillHref = `/docs/skills/${skill.name}`;
+                    const active = pathname === skillHref;
+                    return (
+                      <li key={skill.name}>
+                        <Link
+                          href={skillHref}
+                          onClick={() => setMobileOpen(false)}
+                          className={cn(
+                            "block rounded px-2 py-1 text-sm transition-colors",
+                            active
+                              ? "bg-accent/10 font-medium text-accent"
+                              : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                          )}>
+                          {skill.name}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          )}
 
           {/* Modules */}
           <div>
-            <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Modules</h2>
-            <ul className="space-y-1">
-              {allModules.map((m) => {
-                const active = currentModule === m.name;
-                const inSub = m.children?.some((c) => currentModule === `${m.name}/${c.name}`);
-                return (
-                  <li key={m.name}>
-                    <Link
-                      href={`/docs/${m.name}`}
-                      onClick={() => setMobileOpen(false)}
-                      className={cn(
-                        "block rounded px-2 py-1 text-sm transition-colors",
-                        active || inSub
-                          ? "bg-accent/10 font-medium text-accent"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                      )}>
-                      {m.name}
-                    </Link>
-                    {/* Quicklinks for active module */}
-                    {active && m.exports.length > 0 && (
-                      <ul className="ml-3 mt-1 space-y-0.5 border-l pl-2">
-                        {m.exports.map((exp) => (
-                          <li key={exp.name + exp.line}>
-                            <a
-                              href={`#${exp.name}`}
-                              onClick={() => setMobileOpen(false)}
-                              className="block truncate rounded px-2 py-0.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
-                              {exp.name}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                    {/* Submodule children — only when active or inside a submodule */}
-                    {(active || inSub) && m.children && m.children.length > 0 && (
-                      <ul className="ml-3 mt-1 space-y-0.5 border-l pl-2">
-                        {m.children.map((child) => {
-                          const childPath = `${m.name}/${child.name}`;
-                          const childActive = currentModule === childPath;
-                          return (
-                            <li key={child.name}>
-                              <Link
-                                href={`/docs/${childPath}`}
+            <CollapsibleHeader
+              label="Modules"
+              href="/docs/modules"
+              isOpen={modulesOpen}
+              onToggle={() => setModulesOpen((v) => !v)}
+            />
+            {modulesOpen && (
+              <ul className="space-y-1">
+                {allModules.map((m) => {
+                  const active = currentModule === m.name;
+                  const inSub = m.children?.some((c) => currentModule === `${m.name}/${c.name}`);
+                  return (
+                    <li key={m.name}>
+                      <Link
+                        href={`/docs/${m.name}`}
+                        onClick={() => setMobileOpen(false)}
+                        className={cn(
+                          "block rounded px-2 py-1 text-sm transition-colors",
+                          active || inSub
+                            ? "bg-accent/10 font-medium text-accent"
+                            : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                        )}>
+                        {m.name}
+                      </Link>
+                      {/* Quicklinks for active module */}
+                      {active && m.exports.length > 0 && (
+                        <ul className="ml-3 mt-1 space-y-0.5 border-l pl-2">
+                          {m.exports.map((exp) => (
+                            <li key={exp.name + exp.line}>
+                              <a
+                                href={`#${exp.name}`}
                                 onClick={() => setMobileOpen(false)}
-                                className={cn(
-                                  "block truncate rounded px-2 py-0.5 text-xs transition-colors",
-                                  childActive ? "text-accent font-medium" : "text-muted-foreground hover:text-accent",
-                                )}>
-                                {child.name}
-                              </Link>
+                                className="block truncate rounded px-2 py-0.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
+                                {exp.name}
+                              </a>
                             </li>
-                          );
-                        })}
-                      </ul>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
+                          ))}
+                        </ul>
+                      )}
+                      {/* Submodule children — only when active or inside a submodule */}
+                      {(active || inSub) && m.children && m.children.length > 0 && (
+                        <ul className="ml-3 mt-1 space-y-0.5 border-l pl-2">
+                          {m.children.map((child) => {
+                            const childPath = `${m.name}/${child.name}`;
+                            const childActive = currentModule === childPath;
+                            return (
+                              <li key={child.name}>
+                                <Link
+                                  href={`/docs/${childPath}`}
+                                  onClick={() => setMobileOpen(false)}
+                                  className={cn(
+                                    "block truncate rounded px-2 py-0.5 text-xs transition-colors",
+                                    childActive
+                                      ? "text-accent font-medium"
+                                      : "text-muted-foreground hover:text-accent",
+                                  )}>
+                                  {child.name}
+                                </Link>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
         </nav>
       </aside>

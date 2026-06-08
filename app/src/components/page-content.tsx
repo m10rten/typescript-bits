@@ -3,7 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
 import { UsageView } from "#/usage-view";
-import { CodeBlock } from "#/code-block";
+import { OverflowCodeBlock } from "#/overflow-code-block";
 import { InstallDropdown } from "#/install-dropdown";
 
 interface PageContentProps {
@@ -73,7 +73,7 @@ export function PageContent({
         <div className="flex flex-col gap-6">
           <UsageView examplesHtml={examplesLocalHtml ?? examplesHtml} />
           <h2 className="text-xl font-semibold tracking-tight">Source</h2>
-          <CodeBlock
+          <OverflowCodeBlock
             html={sourceHtml}
             truncatedHtml={sourceTruncatedHtml}
             totalLines={sourceTotalLines}

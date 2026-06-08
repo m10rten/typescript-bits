@@ -84,7 +84,7 @@ export function Search({ items, questions }: SearchProps) {
 
     // Group by category, preserving order
     const groups: Record<string, SearchItemData[]> = {};
-    const order = ["Module", "Submodule", "Export", "Page"] as const;
+    const order = ["Module", "Submodule", "Export", "Skill", "Page"] as const;
 
     for (const { item } of scored) {
       (groups[item.category] ??= []).push(item);

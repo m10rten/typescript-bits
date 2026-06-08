@@ -1,0 +1,16 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "TypeScript & Node.js",
+      "description": "TypeScript and Node.js best practices for strict, maintainable code.",
+      "skills": ["typescript-best-practices", "nodejs-best-practices"]
+    },
+    {
+      "title": "Software Engineering",
+      "description": "Foundational engineering principles and design guidelines.",
+      "skills": ["software-principles-guidelines"]
+    }
+  ]
+}

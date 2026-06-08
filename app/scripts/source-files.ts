@@ -281,13 +281,14 @@ function extractExampleCode(jsdoc: string): string[] {
   return codes;
 }
 
-let _highlighter: Promise<Highlighter> | undefined;
+const HIGHlIGHTER_KEY = "__shiki_highlighter__";
 
-async function getHighlighter(): Promise<Highlighter> {
-  if (!_highlighter) {
-    _highlighter = createHighlighter({ themes: ["github-dark"], langs: ["ts", "bash"] });
+function getHighlighter(): Promise<Highlighter> {
+  const g = globalThis as unknown as Record<string, Promise<Highlighter> | undefined>;
+  if (!g[HIGHlIGHTER_KEY]) {
+    g[HIGHlIGHTER_KEY] = createHighlighter({ themes: ["github-dark"], langs: ["ts", "bash"] });
   }
-  return _highlighter;
+  return g[HIGHlIGHTER_KEY]!;
 }
 
 /** Returns highlighted HTML (<pre><code> wrapper) for a source string. */
@@ -404,6 +405,87 @@ export function getAllModules(): ModuleMeta[] {
   const modules = getModuleNames().map(getModuleContent);
   modules.sort((a, b) => a.name.localeCompare(b.name));
   return modules;
+}
+
+// ── Skill discovery ──────────────────────────────────────────────────────────
+
+const SKILLS_DIR = join(/*turbopackIgnore: true*/ process.cwd(), "..", "skills");
+
+export interface SkillMeta {
+  name: string;
+  displayName: string;
+  description: string;
+  content: string;
+  lineCount: number;
+}
+
+function yamlField(body: string, key: string): string | undefined {
+  const regex = new RegExp(`^${key}:\\s*(.+)$`, "m");
+  const match = regex.exec(body);
+  return match?.[1]?.trim();
+}
+
+/**
+ * Parses a SKILL.md file (with YAML frontmatter) into SkillMeta.
+ * Frontmatter must be delimited by `---` on its own line at start and end.
+ */
+export function parseSkillFile(filePath: string): SkillMeta {
+  const content = readFileSync(filePath, "utf-8");
+
+  // Must start with `---`
+  if (!content.startsWith("---")) {
+    throw new Error(`Skill file ${filePath} is missing YAML frontmatter`);
+  }
+
+  // Match closing `---` after the first line
+  const afterFirst = content.slice(3); // skip opening `---`
+  const endMatch = afterFirst.match(/^---[\r\n]/m);
+  if (!endMatch || endMatch.index === undefined) {
+    throw new Error(`Skill file ${filePath} has unclosed YAML frontmatter`);
+  }
+
+  const fmRaw = afterFirst.slice(0, endMatch.index);
+  const body = afterFirst.slice(endMatch.index + endMatch[0].length);
+
+  const name = yamlField(fmRaw, "name") ?? "";
+  const description = yamlField(fmRaw, "description") ?? "";
+
+  return {
+    name,
+    displayName: name.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+    description,
+    content: body.trim(),
+    lineCount: content.split("\n").length,
+  };
+}
+
+export function getSkillNames(): string[] {
+  const names: string[] = [];
+  try {
+    const entries = readdirSync(SKILLS_DIR, { withFileTypes: true });
+    for (const entry of entries) {
+      if (entry.isDirectory()) {
+        const skillFile = join(SKILLS_DIR, entry.name, "SKILL.md");
+        try {
+          if (readFileSync(skillFile, "utf-8")) names.push(entry.name);
+        } catch {
+          // no SKILL.md — not a skill
+        }
+      }
+    }
+  } catch {
+    // skills/ directory doesn't exist
+  }
+  return names.sort();
+}
+
+export function getSkillContent(skillName: string): SkillMeta {
+  const filePath = join(SKILLS_DIR, skillName, "SKILL.md");
+  return parseSkillFile(filePath);
+}
+
+export function getAllSkills(): SkillMeta[] {
+  return getSkillNames().map(getSkillContent);
 }
 
 const KNOWN_IMPORTS: Record<string, string> = {

@@ -1,4 +1,4 @@
-import { getAllModules } from "../../../scripts/source-files";
+import { getAllModules, getAllSkills } from "../../../scripts/source-files";
 
 function renderDescription(): string {
   const modules = getAllModules();
@@ -23,6 +23,11 @@ function renderModules(): string {
   return lines.join("\n");
 }
 
+function renderSkills(): string {
+  const skills = getAllSkills();
+  return skills.map((s) => `- [${s.displayName}](skills/${s.name}/): ${s.description}`).join("\n");
+}
+
 export function GET(): Response {
   const body = `# typescript-bits
 
@@ -32,6 +37,10 @@ export function GET(): Response {
 
 - [Introduction](/docs/introduction/): Overview of the typescript-bits library and its design principles
 - [Installation](/docs/installation/): Install via package manager, CLI source install, or copy source
+
+## Skills
+
+${renderSkills()}
 
 ## Modules
 

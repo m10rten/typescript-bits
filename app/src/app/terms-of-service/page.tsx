@@ -5,6 +5,8 @@ export const metadata: Metadata = {
   description: "Terms of Service for the typescript-bits website and documentation.",
 };
 
+import ExternalLink from "#/external-link";
+
 export const pageContent =
   "Terms of Service for the typescript-bits website and documentation. " +
   "The site hosts documentation about the typescript-bits open-source TypeScript library. " +
@@ -36,13 +38,11 @@ export default function TosPage() {
           <p className="text-muted-foreground leading-relaxed">
             This Site hosts documentation and information about the typescript-bits open-source TypeScript library. The
             library source code is released under the{" "}
-            <a
+            <ExternalLink
               href="https://opensource.org/licenses/MIT"
-              target="_blank"
-              rel="noopener noreferrer"
               className="underline underline-offset-2 hover:text-foreground transition-colors">
               MIT License
-            </a>{" "}
+            </ExternalLink>{" "}
             and is governed by that license, not by these Terms. These Terms apply solely to your use of the Site
             itself.
           </p>
@@ -112,13 +112,11 @@ export default function TosPage() {
           <h2 className="text-xl font-semibold">10. Contact</h2>
           <p className="text-muted-foreground leading-relaxed">
             If you have questions about these Terms, please open an issue on{" "}
-            <a
+            <ExternalLink
               href="https://github.com/m10rten/typescript-bits"
-              target="_blank"
-              rel="noopener noreferrer"
               className="underline underline-offset-2 hover:text-foreground transition-colors">
               GitHub
-            </a>
+            </ExternalLink>
             .
           </p>
         </section>
