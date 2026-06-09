@@ -5,12 +5,22 @@
     {
       "title": "TypeScript & Node.js",
       "description": "TypeScript and Node.js best practices for strict, maintainable code.",
-      "skills": ["typescript-best-practices", "nodejs-best-practices"]
+      "skills": ["typescript-best-practices", "nodejs-best-practices", "zod-best-practices"]
     },
     {
       "title": "Software Engineering",
-      "description": "Foundational engineering principles and design guidelines.",
-      "skills": ["software-principles-guidelines"]
+      "description": "Foundational engineering principles, algorithmic complexity, design guidelines, and memory management.",
+      "skills": ["software-principles-guidelines", "complexity-principles", "memory-management-guidelines"]
+    },
+    {
+      "title": "Patterns & Composition",
+      "description": "Reusable patterns for async programming and behavior composition.",
+      "skills": ["async-patterns", "composition-patterns"]
+    },
+    {
+      "title": "React & Next.js",
+      "description": "Best practices for React 19 and the Next.js App Router, including Server Components, Server Actions, data fetching, streaming, and performance optimization.",
+      "skills": ["react-best-practices", "nextjs-best-practices"]
     }
   ]
 }

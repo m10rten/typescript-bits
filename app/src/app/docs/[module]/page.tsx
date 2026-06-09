@@ -25,6 +25,7 @@ import {
 import dynamic from "next/dynamic";
 import { PageContent } from "#/page-content";
 import { ScrollProgress } from "#/scroll-progress";
+import { BackToTop } from "#/back-to-top";
 
 const ViewToggle = dynamic(() => import("#/view-toggle").then((mod) => mod.ViewToggle), {
   loading: () => null,
@@ -187,6 +188,7 @@ export default async function ModulePage({ params }: { params: Promise<{ module:
             examplesLocalHtml={examplesLocalHtml}
           />
         </Suspense>
+        <BackToTop />
       </div>
     </>
   );

@@ -39,7 +39,7 @@ Enable all strict checks — these catch real bugs at compile time:
 - Use `type` unions instead of `enum` — they're erasable at runtime, tree-shakeable, and compose naturally.
 - Use `const` objects with `as const` when you need both runtime values and type-level unions.
 
-```typescript
+```ts
 // Prefer this:
 type Status = "active" | "inactive" | "pending";
 
@@ -55,7 +55,7 @@ enum Status {
 
 Use branded types to distinguish structurally identical primitives (e.g., two `string` IDs that must not be confused):
 
-```typescript
+```ts
 type UserId = string & { __brand: "UserId" };
 type PostId = string & { __brand: "PostId" };
 ```
@@ -64,8 +64,22 @@ type PostId = string & { __brand: "PostId" };
 
 Model distinct states as discriminated unions with a literal `type` or `kind` discriminant. This gives you exhaustiveness checking and narrows each branch automatically:
 
-```typescript
+```ts
 type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
+```
+
+Switch on the discriminant for narrowing & exhaustiveness:
+
+```ts
+type Shape = { kind: "circle"; radius: number } | { kind: "square"; side: number };
+function area(s: Shape) {
+  switch (s.kind) {
+    case "circle":
+      return Math.PI * s.radius ** 2;
+    case "square":
+      return s.side ** 2;
+  }
+}
 ```
 
 ### Utility Types — When to Use
@@ -79,16 +93,50 @@ type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
 | `Readonly<T>`  | Config objects, constants passed to consumers                |
 | `Record<K, V>` | Dynamic key-value maps (use with `noUncheckedIndexedAccess`) |
 
+### Advanced: Conditional Types
+
+Use `infer` to extract unwrapped types:
+
+```ts
+type Unwrap<T> = T extends Promise<infer U> ? U : T;
+```
+
 ### Prefer `interface` for Public APIs, `type` for Computed Types
 
-- Use `interface` for object shapes that consumers implement or extend (better error messages, declaration merging possible).
-- Use `type` for unions, intersections, mapped types, and any computed/derived type.
+- Use `interface` for object shapes that consumers implement or extend (declaration merging, better error messages).
+- Use `type` for unions, intersections, mapped/conditional types, tuples, and computed types.
+
+### Mapped Types for Object Transformations
+
+Transform object types by iterating over keys:
+
+```ts
+type Nullable<T> = { [K in keyof T]: T[K] | null };
+type Getters<T> = { [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K] };
+```
+
+### Template Literal Types
+
+Model string patterns for event names, CSS values, and API paths:
+
+```ts
+type EventName = `on${Capitalize<string>}`;
+type CSSValue = `${number}${"px" | "rem"}`;
+```
+
+### Use `satisfies` for Literal Inference
+
+Validates a value matches a type without widening:
+
+```ts
+type Config = { url: string; retries: number };
+const dev = { url: "http://localhost", retries: 3 } satisfies Config;
+```
 
 ## Generics
 
 - Constrain with `extends`: `<T extends HasId>` — never leave a generic unconstrained.
 - Default types reduce inference burden: `<T = string>`.
-- Use `satisfies` keyword for type-safe value inference without widening the declared type.
 
 ## Avoiding `any`
 
@@ -99,7 +147,7 @@ type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
 
 Error handling pattern with `unknown`:
 
-```typescript
+```ts
 try {
   // ...
 } catch (err: unknown) {
@@ -138,7 +186,7 @@ Never re-export modules through index files. Import directly from source files. 
 
 ## Type Testing and Patterns
 
-- Use `satisfies` to validate that a value conforms to a type without widening.
+- Use assertion functions (`asserts x is T`) for runtime validation that narrows types post-return.
 - Write compile-time type tests using `// @ts-expect-error` for negative cases.
 - Avoid type assertions (`as T`) — they lie to the compiler. Use type guards instead.
 

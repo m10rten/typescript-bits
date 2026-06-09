@@ -31,7 +31,7 @@ function saveUserData(data: UserData): Promise<void> { ... }
 
 Software entities should be open for extension, closed for modification.
 
-```typescript
+```ts
 // ❌ Adding a new shape requires editing this function
 function area(shape: Shape): number {
   if (shape.kind === "circle") return Math.PI * shape.radius ** 2;
@@ -67,7 +67,7 @@ class Rectangle implements Shape {
 
 Subtypes must be substitutable for their base types without altering correctness.
 
-```typescript
+```ts
 // ❌ Violates LSP — narrows return type, strengthens preconditions
 class Rectangle {
   setWidth(w: number): void {
@@ -91,12 +91,13 @@ class Square extends Rectangle {
 
 - Prefer composition over inheritance to avoid LSP violations.
 - If a subtype cannot fully honor the contract of its base, restructure with interfaces.
+- The Square/Rectangle violation fundamentally stems from mutable state — using immutable value objects avoids this pattern.
 
 ### Interface Segregation (ISP)
 
 No client should be forced to depend on methods it does not use.
 
-```typescript
+```ts
 // ❌ Fat interface — every printer must implement scan/fax
 interface AllInOne {
   print(doc: Document): void;
@@ -123,7 +124,7 @@ interface Fax {
 
 High-level modules should not depend on low-level modules. Both should depend on abstractions.
 
-```typescript
+```ts
 // ❌ High-level depends on low-level detail
 class UserService { constructor(private db: PostgresDatabase) {} }
 
@@ -142,7 +143,7 @@ class UserService { constructor(private repo: UserRepository) {} }
 
 Every piece of knowledge must have a single, unambiguous representation within a system.
 
-```typescript
+```ts
 // ❌ Duplicated validation logic
 function createUser(data: unknown) { if (!data.name) throw new Error("name required"); ... }
 function updateUser(data: unknown) { if (!data.name) throw new Error("name required"); ... }
@@ -160,7 +161,7 @@ function requireName(data: unknown): asserts data is { name: string } {
 
 Simple systems are easier to understand, test, and change. Complexity is a liability.
 
-```typescript
+```ts
 // ❌ Over-engineered
 class UserBuilder {
   #user: Partial<User> = {};
@@ -193,6 +194,8 @@ Always implement things when you actually need them, never when you merely antic
 - Don't add generic extensibility hooks, plugin systems, or configuration flags for hypothetical future requirements.
 - Refactoring toward generality when a real second use case emerges is cheaper than maintaining unused abstraction.
 - This is not an excuse to write rigid code — extract when the pattern actually repeats.
+- Distinguish hypothetical future-proofing from deliberate feature flags — flags for trunk-based development or gradual rollouts serve an immediate need and are not YAGNI violations.
+- When adding a flag, scope it narrowly and remove it once the decision settles.
 
 ## Structural Principles
 
@@ -200,7 +203,7 @@ Always implement things when you actually need them, never when you merely antic
 
 Favor composing behaviors from small, focused units over deep inheritance hierarchies.
 
-```typescript
+```ts
 // ❌ Deep inheritance
 class Animal {}
 class Mammal extends Animal {}
@@ -227,11 +230,19 @@ Different concerns (data access, business logic, presentation, configuration) be
 - Within a module, separate public API from internal implementation details.
 - Configuration and wiring (DI container, main function) is a concern separate from business logic.
 
+### Functional Core / Imperative Shell
+
+Push side-effects (IO, network, mutations) to a thin outer shell; keep business logic as pure functions at the center.
+
+- Pure functions are trivial to test, reason about, and compose — the `Result` type pattern embodies this.
+- The shell orchestrates: parse input → call pure logic → handle result → persist/output.
+- This boundary is where validation, error wrapping, and resource cleanup naturally live.
+
 ### Law of Demeter (Principle of Least Knowledge)
 
 A unit should only talk to its immediate neighbors — not to the neighbor of a neighbor.
 
-```typescript
+```ts
 // ❌ Train wreck — knows too much about the graph
 const city = order.customer.address.city;
 
@@ -269,7 +280,7 @@ Modules should depend on abstractions, not concrete implementations. Changes in 
 
 Detect and report errors as early as possible — at construction/startup, not deep in a transaction.
 
-```typescript
+```ts
 // ❌ Latent failure — fails at call time
 class Config {
   constructor(private raw: unknown) {}
@@ -313,6 +324,7 @@ Be conservative in what you send, be liberal in what you accept.
 - Test the visible contract (public API, function signatures), not internal implementation details.
 - Refactoring internals should not break tests if the contract holds.
 - Mock at boundaries (IO, external services), not within your domain logic.
+- For pure functions (validation, parsing, transformation), consider property-based testing — assert invariants over random inputs instead of hand-picked examples.
 
 ## Pragmatic Guidelines
 
@@ -320,7 +332,7 @@ Be conservative in what you send, be liberal in what you accept.
 
 Methods should either be commands (mutate state, return void) or queries (return data, no side effects), but not both.
 
-```typescript
+```ts
 // ❌ Mixes command and query
 function pop<T>(stack: T[]): T | undefined {
   return stack.pop();

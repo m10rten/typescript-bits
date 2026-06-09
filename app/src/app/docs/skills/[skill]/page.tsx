@@ -12,6 +12,7 @@ import { Badge } from "#/ui/badge";
 import { getSkillNames, getSkillContent, highlightCode } from "../../../../../scripts/source-files";
 import { CodeBlock } from "#/code-block";
 import { ScrollProgress } from "#/scroll-progress";
+import { BackToTop } from "#/back-to-top";
 import { CodeCopyButton } from "#/copy-button";
 
 export async function generateMetadata({ params }: { params: Promise<{ skill: string }> }): Promise<Metadata> {
@@ -280,8 +281,8 @@ export default async function SkillPage({ params }: { params: Promise<{ skill: s
             <CodeCopyButton source={`npx skills add m10rten/typescript-bits --skill ${skill.name}`} label="copy" />
           </div>
           <p className="text-xs text-muted-foreground">
-            Skills are auto-discovered from this repository; the <code className="text-xs font-mono">--skill</code>{" "}
-            flag installs only this skill.
+            Skills are auto-discovered from this repository; the &nbsp;
+            <code className="text-xs font-mono pl-1">--skill</code> flag installs only this skill.
           </p>
         </div>
 
@@ -311,6 +312,7 @@ export default async function SkillPage({ params }: { params: Promise<{ skill: s
             })}
           </div>
         </div>
+        <BackToTop />
       </div>
     </>
   );

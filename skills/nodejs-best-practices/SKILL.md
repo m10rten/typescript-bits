@@ -47,7 +47,7 @@ Use `package.json` `exports` field for dual ESM/CJS distribution or subpath expo
 - Avoid dynamic `import()` in hot paths — prefer static top-level imports.
 - Use `import.meta.url` instead of `__dirname` / `__filename`:
 
-```typescript
+```ts
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
 
@@ -55,13 +55,15 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 ```
 
+- Node 21.2+ provides `import.meta.dirname` and `import.meta.filename` directly — no `fileURLToPath` + `dirname` conversion needed.
+
 ## Native Testing
 
 ### Use `node:test` and `node:assert`
 
 Prefer Node's built-in test runner over third-party frameworks (Jest, Mocha, Vitest):
 
-```typescript
+```ts
 import { describe, it, before, after, mock } from "node:test";
 import assert from "node:assert/strict";
 import { myModule } from "../src/index.js";
@@ -79,7 +81,7 @@ describe("myModule", () => {
 - Prefer `node:assert/strict` (deepStrictEqual, strictEqual) over the base `node:assert`.
 - Use edge-case arrays with `for` loops for repetitive tests:
 
-```typescript
+```ts
 const edgecases = [
   { input: null, expected: "null" },
   { input: undefined, expected: "undefined" },
@@ -96,7 +98,7 @@ for (const { input, expected } of edgecases) {
 
 Use `mock.fn()` and `mock.method()` from `node:test` — avoid external mocking libraries:
 
-```typescript
+```ts
 import { mock } from "node:test";
 
 const fn = mock.fn((x: number) => x * 2);
@@ -116,7 +118,7 @@ assert.strictEqual(fn.mock.calls.length, 1);
 
 Use `for await...of` for streams and async generators over `.on("data")` / `.on("end")` patterns:
 
-```typescript
+```ts
 import { createReadStream } from "node:fs";
 import { createInterface } from "node:readline";
 
@@ -130,7 +132,7 @@ async function processLines(filePath: string): Promise<void> {
 
 ### Concurrent Execution
 
-```typescript
+```ts
 // Parallel — no ordering needed
 const [a, b] = await Promise.all([fetchA(), fetchB()]);
 
@@ -145,12 +147,26 @@ const result = await Promise.race([
 ]);
 ```
 
+### Promise.withResolvers() & AbortSignal.timeout()
+
+Node 22+: `Promise.withResolvers()` replaces the deferred pattern:
+
+```ts
+const { promise, resolve, reject } = Promise.withResolvers();
+```
+
+`AbortSignal.timeout(5000)` is the simplest timeout — simpler than `Promise.race`:
+
+```ts
+const response = await fetch(url, { signal: AbortSignal.timeout(5000) });
+```
+
 ### Avoid Unhandled Rejections
 
 - Always `await` or `.catch()` promises — never leave them dangling.
 - Register a global handler for unhandled rejections in applications (not libraries):
 
-```typescript
+```ts
 process.on("unhandledRejection", (reason) => {
   console.error("Unhandled rejection:", reason);
   process.exit(1);
@@ -168,7 +184,7 @@ process.on("unhandledRejection", (reason) => {
 
 ### Structured Error Classes
 
-```typescript
+```ts
 export class AppError extends Error {
   readonly code: string;
   readonly statusCode: number;
@@ -188,7 +204,7 @@ export class AppError extends Error {
 
 Use discriminated union `Result` types for expected failures (network, parsing, validation) and reserve `throw` for programmer errors:
 
-```typescript
+```ts
 type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
 
 const parsed = parseJSON(input);
@@ -199,7 +215,7 @@ if (!parsed.ok) {
 
 ### Always Narrow Caught Errors
 
-```typescript
+```ts
 try {
   await operation();
 } catch (err: unknown) {
@@ -216,7 +232,7 @@ try {
 - Read configuration from `process.env` at startup, not inline.
 - Validate and coerce environment variables early:
 
-```typescript
+```ts
 function getEnv(name: string, fallback?: string): string {
   const value = process.env[name] ?? fallback;
   if (value === undefined) {
@@ -246,7 +262,7 @@ Use meaningful exit codes:
 
 ### Signal Handling
 
-```typescript
+```ts
 function shutdown(signal: string) {
   console.log(`Received ${signal}, shutting down gracefully...`);
   server.close(() => process.exit(0));
@@ -257,6 +273,12 @@ process.on("SIGTERM", () => shutdown("SIGTERM"));
 process.on("SIGINT", () => shutdown("SIGINT"));
 ```
 
+### Structured Logging
+
+- Use JSON logging (e.g., `pino`, `bunyan`) over `console.log` in production.
+- Avoid `console.log` in library code — accept a logger or use the `node:events` pattern.
+- Node's test runner supports `--test-reporter` for structured output — use it instead of ad-hoc formatting.
+
 ## Standard Library First
 
 ### Prefer Built-in APIs Over npm Packages
@@ -264,7 +286,9 @@ process.on("SIGINT", () => shutdown("SIGINT"));
 | Need                  | Built-in                     | Instead of                            |
 | --------------------- | ---------------------------- | ------------------------------------- |
 | HTTP server           | `node:http`                  | express                               |
+| HTTP/2 server         | `node:http2`                 | spdy                                  |
 | File system           | `node:fs` (promises)         | fs-extra                              |
+| SQLite (Node 22.5+)   | `node:sqlite`                | better-sqlite3                        |
 | Path manipulation     | `node:path`                  | path-to-regexp                        |
 | URL parsing           | `node:url`                   | urijs                                 |
 | Command-line parsing  | `node:util.parseArgs`        | commander, yargs                      |
@@ -272,6 +296,7 @@ process.on("SIGINT", () => shutdown("SIGINT"));
 | Event system          | `node:events` (EventEmitter) | eventemitter3                         |
 | Streaming             | `node:stream` (web streams)  | through2, pump                        |
 | Crypto                | `node:crypto`                | bcrypt (use scrypt)                   |
+| Subtle Crypto (Web)   | `crypto.subtle`              | forge, node-webcrypto-ossl            |
 | UUID                  | `node:crypto.randomUUID`     | uuid                                  |
 | Environment variables | `process.env`                | dotenv (Node 20+ loads .env natively) |
 
@@ -286,7 +311,7 @@ process.on("SIGINT", () => shutdown("SIGINT"));
 - Use `Buffer.from()` / `Buffer.alloc()` over the `new Buffer()` constructor.
 - Use web `ReadableStream` / `WritableStream` APIs in Node 20+ for cross-platform code.
 
-```typescript
+```ts
 import { Buffer } from "node:buffer";
 import { TextEncoder, TextDecoder } from "node:util";
 
@@ -298,7 +323,7 @@ const decoded = new TextDecoder().decode(encoded);
 
 ### Prefer Promises API
 
-```typescript
+```ts
 import { readFile, writeFile, mkdir, readdir } from "node:fs/promises";
 
 async function readConfig(path: string): Promise<Config> {
@@ -321,7 +346,7 @@ async function readConfig(path: string): Promise<Config> {
 
 Never pass unsanitized user input to shell commands:
 
-```typescript
+```ts
 // ❌ Dangerous
 import { exec } from "node:child_process";
 exec(`ls ${userInput}`); // userInput could be "; rm -rf /"
@@ -337,7 +362,7 @@ spawn("ls", [userInput]);
 
 ### Path Traversal Prevention
 
-```typescript
+```ts
 import { resolve, relative } from "node:path";
 
 function safePath(base: string, userPath: string): string {
@@ -363,7 +388,7 @@ function safePath(base: string, userPath: string): string {
 - Use `once()` for one-shot listeners, `on()` for persistent ones.
 - Always provide a `Symbol.dispose` or explicit cleanup method:
 
-```typescript
+```ts
 import { EventEmitter } from "node:events";
 
 class MyService extends EventEmitter {
@@ -387,7 +412,7 @@ class MyService extends EventEmitter {
 - Always remove listeners when done — especially in long-lived processes.
 - Use the `maxListeners` warning threshold to detect leaks:
 
-```typescript
+```ts
 import { EventEmitter } from "node:events";
 const emitter = new EventEmitter();
 emitter.setMaxListeners(20); // silence warning if intentional
@@ -397,10 +422,26 @@ emitter.setMaxListeners(20); // silence warning if intentional
 
 ### Avoid Blocking the Event Loop
 
-- Offload CPU-intensive work to worker threads via `node:worker_threads`.
+- Offload CPU-intensive work to worker threads via `node:worker_threads`:
+
+```ts
+import { Worker, parentPort, workerData } from "node:worker_threads";
+
+// Main thread
+const worker = new Worker("./cpu-work.js", { workerData: input });
+worker.on("message", (result) => console.log(result));
+
+// cpu-work.js — worker thread
+parentPort.on("message", (data) => {
+  parentPort.postMessage(expensiveComputation(data));
+});
+```
+
+Use `SharedArrayBuffer` for zero-copy sharing of large data between threads.
+
 - Use `setImmediate()` to break up synchronous work:
 
-```typescript
+```ts
 function processInBatches(items: big[], batchSize = 1000): void {
   let index = 0;
   function nextBatch(): void {
@@ -417,7 +458,7 @@ function processInBatches(items: big[], batchSize = 1000): void {
 
 Reuse connections, file handles, and workers — don't create/destroy per request:
 
-```typescript
+```ts
 // ❌ Creates new connection per request
 app.get("/data", async () => {
   const conn = await createConnection();
@@ -442,7 +483,7 @@ app.get("/data", async () => {
 
 ### Parse Arguments with `util.parseArgs`
 
-```typescript
+```ts
 import { parseArgs } from "node:util";
 
 const { values, positionals } = parseArgs({
