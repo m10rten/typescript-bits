@@ -34,13 +34,17 @@ function cliEntries(module: string): Entry[] {
   ];
 }
 
+function shadcnEntries(module: string): Entry[] {
+  return [{ id: "shadcn", label: "npx", command: `npx shadcn@latest add @typescript-bits/${module}` }];
+}
+
 export function InstallDropdown({
   module: moduleName,
   mode,
 }: {
   module?: string;
-  /** Show only the install section or only the CLI section */
-  mode?: "install" | "cli";
+  /** Show only the install section, CLI section, or shadcn section */
+  mode?: "install" | "cli" | "shadcn";
 }) {
   const [installPm, setInstallPm] = useState<string>(INSTALL_ENTRIES[0].id);
   const [scopedPm, setScopedPm] = useState<string>(INSTALL_ENTRIES[0].id);
@@ -53,9 +57,11 @@ export function InstallDropdown({
   const selectedScoped = scopedOptions.find((e) => e.id === scopedPm) ?? scopedOptions[0]!;
   const cliOptions = moduleName ? cliEntries(moduleName) : [];
   const selectedCli = cliOptions.find((e) => e.id === cliPm) ?? cliOptions[0]!;
+  const shadcnOptions = shadcnEntries(moduleName ?? "");
 
   const showInstall = !mode || mode === "install";
   const showCli = moduleName && (!mode || mode === "cli");
+  const showShadcn = moduleName && (!mode || mode === "shadcn");
 
   return (
     <div className="flex flex-col gap-3">
@@ -139,6 +145,23 @@ export function InstallDropdown({
             className="px-4 py-3 font-mono text-sm text-zinc-200 select-all"
             style={{ fontVariantLigatures: "none" }}>
             {selectedCli.command}
+          </div>
+        </div>
+      )}
+
+      {/* shadcn install */}
+      {showShadcn && (
+        <div className="rounded-lg border bg-zinc-950 overflow-hidden">
+          <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-2">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-zinc-400 font-mono">bits</span>
+            </div>
+            <CodeCopyButton source={shadcnOptions[0]!.command} label="npx" />
+          </div>
+          <div
+            className="px-4 py-3 font-mono text-sm text-zinc-200 select-all"
+            style={{ fontVariantLigatures: "none" }}>
+            {shadcnOptions[0]!.command}
           </div>
         </div>
       )}

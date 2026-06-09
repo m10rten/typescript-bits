@@ -290,7 +290,8 @@ export default async function SkillPage({ params }: { params: Promise<{ skill: s
           <div className="w-[85%] mx-auto border-t border-border" />
           <div className="flex items-center justify-between gap-2 pt-4 ">
             <span className="text-xs text-muted-foreground">
-              <code className="font-mono">skill.md</code> &middot; {skill.lineCount} lines
+              <code className="font-mono">skill.md</code> &middot; {skill.lineCount} lines &middot; {skill.tokenCount}{" "}
+              tokens
             </span>
             <CodeCopyButton
               source={skill.content}

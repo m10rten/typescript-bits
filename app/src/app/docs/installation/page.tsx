@@ -13,7 +13,7 @@ import Link from "next/link";
 import { CopyLine } from "./copy-line";
 
 export const pageContent =
-  "Three ways to use a module: Install Package via npm yarn pnpm bun from node_modules. " +
+  "Three ways to use a module: Install Package via npm yarn pnpm bun or shadcn CLI from node_modules. " +
   "Install Source via CLI — copy into project as editable source file, dependencies resolved automatically. " +
   "Copy Source — navigate to module page, switch to Copy Source view, and copy highlighted code directly. " +
   "Agent skills install via npx skills add m10rten/typescript-bits. " +
@@ -51,12 +51,9 @@ export default async function InstallationPage() {
       <div className="flex flex-col gap-3">
         <h2 className="text-xl font-semibold tracking-tight">Install Package</h2>
         <p className="text-sm text-muted-foreground">
-          Use a package manager to install <code>typescript-bits</code> and import modules from{" "}
-          <code>node_modules</code>. Best for projects that already use npm/yarn/pnpm/bun.
+          Install via npm/yarn/pnpm/bun from <code>node_modules</code>, or via the shadcn CLI as editable source files.
         </p>
-        <div className="max-w-md">
-          <InstallDropdown module="atom" mode="install" />
-        </div>
+        <InstallDropdown module="atom" />
         <p className="text-sm text-muted-foreground">Then import the module by name:</p>
         <CopyLine code={`import { atom, type Atom } from "typescript-bits/atom";`} highlighted={packageImport} />
       </div>

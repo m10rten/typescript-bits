@@ -1,0 +1,73 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "typescript-bits",
+  "homepage": "https://ts.mvdlei.nl",
+  "items": [
+    {
+      "name": "atom",
+      "type": "registry:lib",
+      "title": "Atom",
+      "description": "Reactive state atom with subscriptions",
+      "files": [{ "path": "packages/atom/src/index.ts", "type": "registry:lib" }]
+    },
+    {
+      "name": "json",
+      "type": "registry:lib",
+      "title": "Rich JSON",
+      "description": "Rich JSON serialization with extended type support",
+      "files": [{ "path": "packages/json/src/index.ts", "type": "registry:lib" }]
+    },
+    {
+      "name": "queue",
+      "type": "registry:lib",
+      "title": "Queue",
+      "description": "Event-driven queue with typed event system",
+      "files": [{ "path": "packages/queue/src/index.ts", "type": "registry:lib" }]
+    },
+    {
+      "name": "reset",
+      "type": "registry:lib",
+      "title": "Reset",
+      "description": "TypeScript built-in type resets (unknown over any)",
+      "files": [
+        { "path": "packages/reset/src/index.ts", "type": "registry:lib" },
+        { "path": "packages/reset/src/array.ts", "type": "registry:lib" },
+        { "path": "packages/reset/src/fetch.ts", "type": "registry:lib" },
+        { "path": "packages/reset/src/filter.ts", "type": "registry:lib" },
+        { "path": "packages/reset/src/json.ts", "type": "registry:lib" },
+        { "path": "packages/reset/src/map.ts", "type": "registry:lib" },
+        { "path": "packages/reset/src/set.ts", "type": "registry:lib" }
+      ]
+    },
+    {
+      "name": "result",
+      "type": "registry:lib",
+      "title": "Result",
+      "description": "Type-safe Result type (Ok/Err)",
+      "files": [{ "path": "packages/result/src/index.ts", "type": "registry:lib" }]
+    },
+    {
+      "name": "retry",
+      "type": "registry:lib",
+      "title": "Retry",
+      "description": "Retry utility with configurable backoff strategies",
+      "registryDependencies": ["result", "safe"],
+      "files": [{ "path": "packages/retry/src/index.ts", "type": "registry:lib" }]
+    },
+    {
+      "name": "safe",
+      "type": "registry:lib",
+      "title": "Safe",
+      "description": "Safe execution wrapper returning Results",
+      "registryDependencies": ["result"],
+      "files": [{ "path": "packages/safe/src/index.ts", "type": "registry:lib" }]
+    },
+    {
+      "name": "types",
+      "type": "registry:lib",
+      "title": "Types",
+      "description": "Utility types (Enumerate, Range)",
+      "files": [{ "path": "packages/types/src/index.ts", "type": "registry:lib" }]
+    }
+  ]
+}

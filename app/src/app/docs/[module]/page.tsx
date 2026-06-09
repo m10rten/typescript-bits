@@ -24,6 +24,7 @@ import {
 } from "../../../../scripts/source-files";
 import dynamic from "next/dynamic";
 import { PageContent } from "#/page-content";
+import { InstallDropdown } from "#/install-dropdown";
 import { ScrollProgress } from "#/scroll-progress";
 
 const ViewToggle = dynamic(() => import("#/view-toggle").then((mod) => mod.ViewToggle), {
@@ -148,6 +149,20 @@ export default async function ModulePage({ params }: { params: Promise<{ module:
           ) : (
             <Badge variant="ghost">zero dependencies</Badge>
           )}
+        </div>
+
+        {/* Install via shadcn */}
+        <div className="flex flex-col gap-3">
+          <h2 className="text-xl font-semibold tracking-tight">Install via shadcn</h2>
+          <p className="text-sm text-muted-foreground">
+            Install as editable source files using the shadcn CLI. Files are written to{" "}
+            <code className="text-xs font-mono">components/bits/</code> by default, configurable via{" "}
+            <code className="text-xs font-mono">aliases.bits</code> in{" "}
+            <code className="text-xs font-mono">components.json</code>.
+          </p>
+          <div>
+            <InstallDropdown module={moduleName} mode="shadcn" />
+          </div>
         </div>
 
         {/* Submodules — always visible, independent of view toggle */}

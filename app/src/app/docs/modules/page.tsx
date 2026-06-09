@@ -39,9 +39,13 @@ export default function ModulesOverviewPage() {
               size="sm"
               badges={
                 <>
-                  {m.imports.length > 0 && (
+                  {m.imports.length > 0 ? (
                     <Badge variant="outline" className="text-[10px] px-1.5 py-0">
                       {m.imports.length} dep{m.imports.length !== 1 ? "s" : ""}
+                    </Badge>
+                  ) : (
+                    <Badge variant="ghost" className="text-[10px] px-1.5 py-0">
+                      zero dep
                     </Badge>
                   )}
                   {m.children && m.children.length > 0 && (

@@ -25,7 +25,15 @@
       "#/*": ["./src/components/*"],
       "$/*": ["./src/hooks/*"],
       "~/*": ["./src/lib/*"],
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@typescript-bits/atom": ["../packages/atom/src/index.ts"],
+      "@typescript-bits/result": ["../packages/result/src/index.ts"],
+      "@typescript-bits/queue": ["../packages/queue/src/index.ts"],
+      "@typescript-bits/safe": ["../packages/safe/src/index.ts"],
+      "@typescript-bits/retry": ["../packages/retry/src/index.ts"],
+      "@typescript-bits/json": ["../packages/json/src/index.ts"],
+      "@typescript-bits/reset": ["../packages/reset/src/index.ts"],
+      "@typescript-bits/types": ["../packages/types/src/index.ts"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts", "**/*.mts"],

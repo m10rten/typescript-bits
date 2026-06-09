@@ -417,6 +417,7 @@ export interface SkillMeta {
   description: string;
   content: string;
   lineCount: number;
+  tokenCount: number;
 }
 
 function yamlField(body: string, key: string): string | undefined {
@@ -450,12 +451,17 @@ export function parseSkillFile(filePath: string): SkillMeta {
   const name = yamlField(fmRaw, "name") ?? "";
   const description = yamlField(fmRaw, "description") ?? "";
 
+  // Approximate token count: words × ~1.35 (standard English token-to-word ratio)
+  const wordCount = content.split(/\s+/).filter(Boolean).length;
+  const tokenCount = Math.ceil(wordCount * 1.35);
+
   return {
     name,
     displayName: name.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
     description,
     content: body.trim(),
     lineCount: content.split("\n").length,
+    tokenCount,
   };
 }
 
