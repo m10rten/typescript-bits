@@ -1,6 +1,8 @@
 /**
  * Generate a union of numbers `0` to `N-1`.
  *
+ * @summary Compile-time numeric range utilities: `Enumerate<N>` produces a union of `0` through `N-1`, and `Range<F, T>` produces `F` through `T-1`. Useful for constraining numeric literals in APIs — port numbers, indices, pagination limits — without any runtime overhead. Both are pure type-level constructs; zero runtime code is emitted.
+ *
  * @example
  * ```ts
  * import type { Enumerate } from "@typescript-bits/types";

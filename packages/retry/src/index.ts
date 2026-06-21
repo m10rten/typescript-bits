@@ -4,6 +4,11 @@ import { Safe } from "@typescript-bits/safe";
 /**
  * Configuration for {@link retry}.
  *
+ * @summary Retries any sync or async operation up to a configurable number of attempts, with
+ * optional fixed or exponentially increasing delays between each try. A `transform` option lets
+ * you map raw thrown values into typed errors, and a single overloaded `retry()` function handles
+ * both plain functions and Promises transparently.
+ *
  * @example
  * ```ts
  * import { retry } from "@typescript-bits/retry";

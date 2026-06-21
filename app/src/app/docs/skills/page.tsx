@@ -1,11 +1,25 @@
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "#/ui/breadcrumb";
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbPage,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+} from "#/ui/breadcrumb";
 import { Badge } from "#/ui/badge";
 import { Card } from "#/card";
-import { CommandLine } from "#/command-line";
+import { SkillsInstallTabs } from "#/skills-install-tabs";
 import { getAllSkills } from "../../../../scripts/source-files";
 import ExternalLink from "#/external-link";
 
 const SKILLS_REPO = "m10rten/typescript-bits";
+
+function formatTokenCount(count: number): string {
+  if (count < 1000) return String(count);
+  const k = count / 1000;
+  // Trim trailing ".0" so 1000 → "1k", 1100 → "1.1k"
+  return `${parseFloat(k.toFixed(1))}k`;
+}
 
 function clampSkillTitle(title: string): string {
   // Display up to the first comma or end
@@ -21,7 +35,15 @@ export default async function SkillsOverviewPage() {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbPage>Docs</BreadcrumbPage>
+            <BreadcrumbLink href="/">~</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/docs/introduction">Docs</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Skills</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -45,12 +67,7 @@ export default async function SkillsOverviewPage() {
         </div>
 
         {/* Install command */}
-        <div className="rounded-lg border bg-card text-card-foreground">
-          <div className="border-b px-4 py-2 text-xs font-medium text-muted-foreground">Install</div>
-          <div className="px-4 py-3">
-            <CommandLine command={`npx skills add ${SKILLS_REPO}`} label="npx" />
-          </div>
-        </div>
+        <SkillsInstallTabs repo={SKILLS_REPO} />
 
         <div className="flex flex-wrap gap-2">
           <Badge variant="outline" className="text-xs">
@@ -73,7 +90,16 @@ export default async function SkillsOverviewPage() {
           <h2 className="text-xl font-semibold tracking-tight">Available Skills</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {skills.map((skill) => (
-              <Card key={skill.name} title={skill.displayName} href={`/docs/skills/${skill.name}`} size="sm">
+              <Card
+                key={skill.name}
+                title={skill.displayName}
+                href={`/docs/skills/${skill.name}`}
+                size="sm"
+                badges={
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded border border-purple-300/60 text-purple-400 leading-none">
+                    {formatTokenCount(skill.tokenCount)}
+                  </span>
+                }>
                 {clampSkillTitle(skill.description)}
               </Card>
             ))}

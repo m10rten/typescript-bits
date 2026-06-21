@@ -34,6 +34,7 @@ auth-recipes                      # recipes category, auth domain
 | `typescript-best-practices`      | best-practices | TypeScript                   |
 | `nodejs-best-practices`          | best-practices | Node.js                      |
 | `zod-best-practices`             | best-practices | Zod                          |
+| `http-rest-guidelines`           | guidelines     | HTTP REST APIs               |
 | `async-patterns`                 | patterns       | Asynchronous programming     |
 | `composition-patterns`           | patterns       | Function/object composition  |
 | `react-best-practices`           | best-practices | React 19                     |

@@ -5,7 +5,7 @@ description: Concrete patterns for composing behavior from small units — funct
 
 # Composition Patterns
 
-Practical patterns for composing behavior from small units. The _how_ counterpart to the _why_ in software-principles-guidelines. Apply these when building composable APIs or combining existing primitives into larger workflows.
+Practical patterns for composing behavior from small units. Apply these when building composable APIs or combining existing primitives into larger workflows.
 
 ## Function Composition
 

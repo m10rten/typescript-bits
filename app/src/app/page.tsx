@@ -6,6 +6,7 @@ import { getAllModules, getAllSkills } from "../../scripts/source-files";
 import { InstallHero } from "#/install-hero";
 import { Card } from "#/card";
 import { ExternalLink } from "#/external-link";
+import { featuredModules, featuredSkills } from "@/config/featured";
 
 function buildHeroDescription(): string {
   return `Production-grade TypeScript primitives and AI agent skills — zero-dependency, tree-shakeable, fully typed, and rigorously tested.`;
@@ -15,25 +16,30 @@ export default function Home() {
   const allModules = getAllModules();
   const allSkills = getAllSkills();
 
+  const featuredModuleList = featuredModules
+    .map((name) => allModules.find((m) => m.name === name))
+    .filter((m): m is NonNullable<typeof m> => m != null);
+
+  const featuredSkillList = featuredSkills
+    .map((name) => allSkills.find((s) => s.name === name))
+    .filter((s): s is NonNullable<typeof s> => s != null);
+
   return (
     <div className="flex flex-col flex-1">
       <section aria-labelledby="hero-title" className="hero-bg relative overflow-hidden">
-        {/* Background gradient blobs */}
+        {/* Masked line grid texture */}
         <div
-          className="absolute inset-0 -z-10"
+          className="pointer-events-none absolute inset-0"
           aria-hidden="true"
           style={{
-            backgroundImage: `radial-gradient(circle, oklch(0 0 0 / 0.03) 1px, transparent 1px)`,
-            backgroundSize: "24px 24px",
+            backgroundImage: [
+              "linear-gradient(to right, oklch(0 0 0 / 0.045) 1px, transparent 1px)",
+              "linear-gradient(to bottom, oklch(0 0 0 / 0.045) 1px, transparent 1px)",
+            ].join(", "),
+            backgroundSize: "32px 32px",
+            maskImage: "radial-gradient(ellipse 80% 65% at 30% 0%, black, transparent 80%)",
+            WebkitMaskImage: "radial-gradient(ellipse 80% 65% at 30% 0%, black, transparent 80%)",
           }}
-        />
-        <div
-          className="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-primary/5 blur-[120px] -z-10"
-          aria-hidden="true"
-        />
-        <div
-          className="absolute -bottom-32 right-0 w-[400px] h-[400px] rounded-full bg-chart-2/8 blur-[100px] -z-10"
-          aria-hidden="true"
         />
 
         <div className="container-main py-16 md:py-24">
@@ -61,12 +67,36 @@ export default function Home() {
         </div>
       </section>
 
-      <section aria-labelledby="modules-title" className="container-main py-12 md:py-16">
+      <section aria-labelledby="skills-title" className="container-main py-12 md:py-16">
+        <h2 id="skills-title" className="text-2xl font-semibold mb-6">
+          Agent Skills
+        </h2>
+        <p className="text-sm text-muted-foreground mb-6 max-w-prose">
+          Reusable agent skill instructions — extend OpenCode, Codex, Claude Code, and 50+ other AI coding agents with
+          project-specific knowledge.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {featuredSkillList.map((s) => (
+            <Card key={s.name} title={s.displayName} href={`/docs/skills/${s.name}`} size="sm">
+              {s.description}
+            </Card>
+          ))}
+        </div>
+        <div className="mt-4 flex justify-start">
+          <Link
+            href="/docs/skills"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+            See all {allSkills.length} skills →
+          </Link>
+        </div>
+      </section>
+
+      <section aria-labelledby="modules-title" className="container-main pb-12 md:pb-16">
         <h2 id="modules-title" className="text-2xl font-semibold mb-6">
           Modules
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {allModules.map((m) => (
+          {featuredModuleList.map((m) => (
             <Card
               key={m.name}
               title={m.name}
@@ -90,22 +120,12 @@ export default function Home() {
             </Card>
           ))}
         </div>
-      </section>
-
-      <section aria-labelledby="skills-title" className="container-main pb-12 md:pb-16">
-        <h2 id="skills-title" className="text-2xl font-semibold mb-6">
-          Agent Skills
-        </h2>
-        <p className="text-sm text-muted-foreground mb-6 max-w-prose">
-          Reusable agent skill instructions — extend OpenCode, Codex, Claude Code, and 50+ other AI coding agents with
-          project-specific knowledge.
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {allSkills.map((s) => (
-            <Card key={s.name} title={s.displayName} href={`/docs/skills/${s.name}`} size="sm">
-              {s.description}
-            </Card>
-          ))}
+        <div className="mt-4 flex justify-start">
+          <Link
+            href="/docs/modules"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+            See all {allModules.length} modules →
+          </Link>
         </div>
       </section>
     </div>

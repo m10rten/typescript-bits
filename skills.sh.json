@@ -4,20 +4,25 @@
   "groupings": [
     {
       "title": "TypeScript & Node.js",
-      "description": "TypeScript and Node.js best practices for strict, maintainable code.",
-      "skills": ["typescript-best-practices", "nodejs-best-practices", "zod-best-practices", "esm-best-practices"]
+      "description": "TypeScript, Node.js, and ESM best practices for strict, maintainable code.",
+      "skills": ["typescript-best-practices", "nodejs-best-practices", "esm-best-practices"]
     },
     {
       "title": "Software Engineering",
-      "description": "Foundational engineering principles, algorithmic complexity, design guidelines, and memory management.",
+      "description": "Foundational engineering principles, algorithmic complexity, design guidelines, memory management, and monorepo patterns.",
       "skills": [
         "software-principles-guidelines",
         "complexity-principles",
         "memory-management-guidelines",
         "api-design-guidelines",
-        "testing-guidelines",
+        "http-rest-guidelines",
         "monorepo-guidelines"
       ]
+    },
+    {
+      "title": "Testing",
+      "description": "Guidelines and tooling for writing reliable, maintainable tests.",
+      "skills": ["testing-guidelines", "playwright-best-practices"]
     },
     {
       "title": "Patterns",
@@ -31,9 +36,9 @@
       ]
     },
     {
-      "title": "React & Next.js",
-      "description": "Best practices for React 19 and the Next.js App Router, including Server Components, Server Actions, data fetching, streaming, and performance optimization.",
-      "skills": ["react-best-practices", "nextjs-best-practices"]
+      "title": "Packages & Libraries",
+      "description": "Best practices for widely-used packages and frameworks.",
+      "skills": ["zod-best-practices", "react-best-practices", "nextjs-best-practices"]
     }
   ]
 }

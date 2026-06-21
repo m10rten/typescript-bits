@@ -97,6 +97,17 @@ export default async function ModulePage({ params }: { params: Promise<{ module:
   const combinedLocalCode = transformImportsToLocal(combinedCode);
   const examplesLocalHtml = combinedLocalCode ? addCodeAnchors(await highlightCode(combinedLocalCode), []) : "";
 
+  const aiPrompt = `I want to use the \`${module.name}\` module from typescript-bits in my TypeScript project.
+
+Module: ${module.displayName}
+Description: ${module.description}
+Import: \`import { ... } from "${module.importPath}"\`
+Docs: https://ts.mvdlei.nl/docs/${module.name}
+
+Project context (llms.txt): https://ts.mvdlei.nl/llms.txt
+
+Please help me integrate this into my project.`.trim();
+
   return (
     <>
       <ScrollProgress />
@@ -115,11 +126,15 @@ export default async function ModulePage({ params }: { params: Promise<{ module:
           }}
         />
         {/* Breadcrumbs + View Toggle */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex flex-row items-center justify-between gap-2">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink href="/docs">Docs</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/docs/modules">Modules</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
@@ -186,6 +201,7 @@ export default async function ModulePage({ params }: { params: Promise<{ module:
             importLocalHtml={importLocalHtml}
             examplesHtml={examplesHtml}
             examplesLocalHtml={examplesLocalHtml}
+            aiPrompt={aiPrompt}
           />
         </Suspense>
         <BackToTop />

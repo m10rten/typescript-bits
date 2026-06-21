@@ -139,14 +139,16 @@
 .hero-bg {
   background-color: var(--background);
   background-image:
-    radial-gradient(ellipse 80% 50% at 50% -20%, color-mix(in oklch, var(--primary) 8%, transparent), transparent),
-    radial-gradient(ellipse 50% 40% at 70% 80%, color-mix(in oklch, var(--chart-2) 10%, transparent), transparent);
+    radial-gradient(ellipse 60% 50% at 15% -10%, color-mix(in oklch, var(--accent) 18%, transparent), transparent 60%),
+    radial-gradient(ellipse 50% 60% at 95% 30%, color-mix(in oklch, var(--accent) 10%, transparent), transparent 60%),
+    radial-gradient(ellipse 80% 40% at 50% 110%, color-mix(in oklch, var(--primary) 6%, transparent), transparent 70%);
 }
 
 .dark .hero-bg {
   background-image:
-    radial-gradient(ellipse 80% 50% at 50% -20%, color-mix(in oklch, var(--primary) 15%, transparent), transparent),
-    radial-gradient(ellipse 50% 40% at 70% 80%, color-mix(in oklch, var(--chart-2) 18%, transparent), transparent);
+    radial-gradient(ellipse 60% 50% at 15% -10%, color-mix(in oklch, var(--accent) 26%, transparent), transparent 60%),
+    radial-gradient(ellipse 50% 60% at 95% 30%, color-mix(in oklch, var(--accent) 16%, transparent), transparent 60%),
+    radial-gradient(ellipse 80% 40% at 50% 110%, color-mix(in oklch, var(--primary) 10%, transparent), transparent 70%);
 }
 
 .scrollbar-gutter-stable {

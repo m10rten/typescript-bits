@@ -14,7 +14,7 @@ export default function Icon() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "#000",
+        backgroundColor: "oklch(0.6 0.12 300)",
         borderRadius: "22%",
       }}>
       <img src={STAR_SVG} width={20} height={20} alt="" />

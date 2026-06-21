@@ -5,7 +5,7 @@ description: ESM-specific patterns for TypeScript and Node.js — file extension
 
 # ESM Best Practices
 
-Covers the ESM-specific layer on top of TypeScript and Node.js. For general tsconfig options see `typescript-best-practices`; for Node.js built-in APIs see `nodejs-best-practices`.
+Covers the ESM-specific layer on top of TypeScript and Node.js.
 
 ## `"type": "module"` in package.json
 

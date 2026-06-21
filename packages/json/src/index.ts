@@ -115,6 +115,12 @@ export function reviver(_key: string, value: unknown): unknown {
 /**
  * Rich JSON — stringify and parse with extended type support (Map, Set, Date, BigInt, etc.).
  *
+ * @summary Extends `JSON.stringify` and `JSON.parse` to handle types the standard serializer
+ * silently drops — `Map`, `Set`, `Date`, `BigInt`, `RegExp`, `Error`, `Symbol`, and `undefined`.
+ * A replacer/reviver pair tags each value during serialization and restores it on parse, giving
+ * full round-trip fidelity. The `RichJSON` namespace mirrors the standard `JSON` API, so adoption
+ * is a one-word swap.
+ *
  * @example
  * ```ts
  * import { RichJSON } from "@typescript-bits/json";
@@ -126,11 +132,48 @@ export function reviver(_key: string, value: unknown): unknown {
  * ```
  */
 export namespace RichJSON {
+  /**
+   * Parse a JSON string produced by {@link RichJSON.stringify}, restoring special types.
+   *
+   * Supported types: `Map`, `Set`, `Date`, `BigInt`, `RegExp`, `Error`, `Symbol`, `undefined`.
+   *
+   * @param text - JSON string to parse
+   * @param userReviver - Optional reviver applied after type restoration
+   * @returns The parsed value with special types restored
+   *
+   * @example
+   * ```ts
+   * import { RichJSON } from "@typescript-bits/json";
+   *
+   * const str = RichJSON.stringify(new Map([["key", 1]]));
+   * const map = RichJSON.parse(str) as Map<string, number>;
+   * // map instanceof Map === true
+   * ```
+   */
   export function parse(text: string, userReviver?: (key: string, value: unknown) => unknown): unknown {
     const parsed = JSON.parse(text);
     return restoreWalk("", parsed, userReviver);
   }
 
+  /**
+   * Serialize a value to JSON, encoding special types so they survive a round-trip through {@link RichJSON.parse}.
+   *
+   * Supported types: `Map`, `Set`, `Date`, `BigInt`, `RegExp`, `Error`, `Symbol`, `undefined`.
+   *
+   * @param value - The value to serialize
+   * @param userReplacer - Optional replacer function or key allowlist, applied after type encoding
+   * @param space - Indentation argument passed to `JSON.stringify`
+   * @returns A JSON string
+   *
+   * @example
+   * ```ts
+   * import { RichJSON } from "@typescript-bits/json";
+   *
+   * const str = RichJSON.stringify({ ts: new Date("2025-01-01") });
+   * const parsed = RichJSON.parse(str) as { ts: Date };
+   * // parsed.ts instanceof Date === true
+   * ```
+   */
   export function stringify(
     value: unknown,
     userReplacer?: ((key: string, value: unknown) => unknown) | (string | number)[] | null,

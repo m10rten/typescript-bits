@@ -14,6 +14,13 @@ import { CodeBlock } from "#/code-block";
 import { ScrollProgress } from "#/scroll-progress";
 import { BackToTop } from "#/back-to-top";
 import { CodeCopyButton } from "#/copy-button";
+import { SkillInstallTabs } from "#/skill-install-tabs";
+
+function formatTokenCount(count: number): string {
+  if (count < 1000) return String(count);
+  const k = count / 1000;
+  return `${parseFloat(k.toFixed(1))}k`;
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ skill: string }> }): Promise<Metadata> {
   const { skill: skillName } = await params;
@@ -62,6 +69,17 @@ async function awaitHighlightInner(code: string, lang: string): Promise<{ html: 
 }
 
 /**
+ * Applies all inline formatting transformations in order:
+ * backtick code, __underline__ mono-italic, and **bold**.
+ */
+function inlineFormat(text: string): string {
+  return text
+    .replace(/`([^`]+)`/g, '<code class="rounded bg-muted px-1 py-0.5 text-sm font-mono">`$1`</code>')
+    .replace(/__([^_]+)__/g, '<code class="rounded bg-muted px-1 py-0.5 text-sm font-mono italic">$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+}
+
+/**
  * Structured content chunk from rendering skill markdown.
  */
 interface HtmlChunk {
@@ -105,7 +123,10 @@ async function renderSkillContent(content: string): Promise<ContentChunk[]> {
       const bodyRows = bodyLines.map((row) => {
         const cells = parseRow(row);
         return `<tr>${cells
-          .map((c) => `<td class="px-4 py-2.5 text-sm text-muted-foreground border-t border-border">${c}</td>`)
+          .map(
+            (c) =>
+              `<td class="px-4 py-2.5 text-sm text-muted-foreground border-t border-border">${inlineFormat(c)}</td>`,
+          )
           .join("")}</tr>`;
       });
 
@@ -116,7 +137,7 @@ async function renderSkillContent(content: string): Promise<ContentChunk[]> {
 <thead><tr>${headerCells
           .map(
             (c) =>
-              `<th class="px-4 py-2.5 text-xs font-semibold text-foreground uppercase tracking-wider text-left bg-muted/30 border-b border-border">${c}</th>`,
+              `<th class="px-4 py-2.5 text-xs font-semibold text-foreground uppercase tracking-wider text-left bg-muted/30 border-b border-border">${inlineFormat(c)}</th>`,
           )
           .join("")}</tr></thead>
 <tbody>${bodyRows.join("")}</tbody>
@@ -172,7 +193,7 @@ async function renderSkillContent(content: string): Promise<ContentChunk[]> {
     const headingMatch = line.match(/^(#{1,3})\s+(.+)$/);
     if (headingMatch) {
       const level = headingMatch[1]!.length;
-      const text = headingMatch[2]!;
+      const text = inlineFormat(headingMatch[2]!);
       const tag = `h${level + 1}`; // h2/h3/h4 since h1 is the page title
       const sizes: Record<number, string> = {
         1: "text-2xl font-bold mt-8",
@@ -183,27 +204,28 @@ async function renderSkillContent(content: string): Promise<ContentChunk[]> {
       continue;
     }
 
-    // Inline code
-    const processed = line.replace(
-      /`([^`]+)`/g,
-      '<code class="rounded bg-muted px-1 py-0.5 text-sm font-mono">$1</code>',
-    );
-
-    // Bold
-    const boldProcessed = processed.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+    // Blockquote
+    const blockquoteMatch = line.match(/^>\s+(.+)$/);
+    if (blockquoteMatch) {
+      chunks.push({
+        type: "html",
+        html: `<blockquote class="border-l-2 border-border pl-4 text-sm text-muted-foreground italic my-1">${inlineFormat(blockquoteMatch[1]!)}</blockquote>`,
+      });
+      continue;
+    }
 
     // Unordered list
-    const listMatch = boldProcessed.match(/^[-*]\s+(.+)$/);
+    const listMatch = line.match(/^[-*]\s+(.+)$/);
     if (listMatch) {
       chunks.push({
         type: "html",
-        html: `<li class="text-sm text-muted-foreground ml-4 list-disc">${listMatch[1]}</li>`,
+        html: `<li class="text-sm text-muted-foreground ml-4 list-disc">${inlineFormat(listMatch[1]!)}</li>`,
       });
       continue;
     }
 
     // Regular paragraph
-    chunks.push({ type: "html", html: `<p class="text-sm text-muted-foreground">${boldProcessed}</p>` });
+    chunks.push({ type: "html", html: `<p class="text-sm text-muted-foreground">${inlineFormat(line)}</p>` });
   }
 
   flushTable();
@@ -228,6 +250,17 @@ export default async function SkillPage({ params }: { params: Promise<{ skill: s
   }
 
   const contentChunks = await renderSkillContent(skill.content);
+
+  const aiPrompt = `Load the "${skill.displayName}" skill from typescript-bits into my AI coding agent.
+
+Skill: ${skill.name}
+Description: ${skill.description}
+Install: \`npx skills add m10rten/typescript-bits --skill ${skill.name}\`
+Docs: https://ts.mvdlei.nl/docs/skills/${skill.name}
+
+Project context (llms.txt): https://ts.mvdlei.nl/llms.txt
+
+Please help me set up this skill.`.trim();
 
   return (
     <>
@@ -266,32 +299,21 @@ export default async function SkillPage({ params }: { params: Promise<{ skill: s
           </Badge>
         </div>
 
-        {/* Installation */}
-        <div className="flex flex-col gap-3 rounded-lg border bg-card p-3 sm:p-5">
-          <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-muted-foreground">
-              Install via the skills CLI (<code className="text-xs font-mono">skills.sh</code>):
-            </p>
-            <span className="text-xs font-medium text-muted-foreground">npx</span>
-          </div>
-          <div className="flex items-center gap-3 bg-background rounded-md border px-4 py-3">
-            <code className="flex-1 text-sm font-mono select-all" style={{ fontVariantLigatures: "none" }}>
-              npx skills add m10rten/typescript-bits --skill {skill.name}
-            </code>
-            <CodeCopyButton source={`npx skills add m10rten/typescript-bits --skill ${skill.name}`} label="copy" />
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Skills are auto-discovered from this repository; the &nbsp;
-            <code className="text-xs font-mono pl-1">--skill</code> flag installs only this skill.
-          </p>
-        </div>
+        {/* Install */}
+        <SkillInstallTabs
+          skillCmd={`npx skills add m10rten/typescript-bits --skill ${skill.name}`}
+          prompt={aiPrompt}
+        />
 
         {/* Skill content */}
         <div className="flex flex-col gap-0">
           <div className="w-[85%] mx-auto border-t border-border" />
           <div className="flex items-center justify-between gap-2 pt-4 ">
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs text-muted-foreground flex items-center gap-2">
               <code className="font-mono">skill.md</code> &middot; {skill.lineCount} lines
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded border border-purple-300/60 text-purple-400 leading-none">
+                ~{formatTokenCount(skill.tokenCount)}
+              </span>
             </span>
             <CodeCopyButton
               source={skill.content}

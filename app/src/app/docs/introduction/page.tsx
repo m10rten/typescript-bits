@@ -1,8 +1,16 @@
 import Link from "next/link";
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "#/ui/breadcrumb";
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbPage,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+} from "#/ui/breadcrumb";
 import { Badge } from "#/ui/badge";
 import { Card } from "#/card";
 import { getAllModules, getAllSkills } from "../../../../scripts/source-files";
+import { featuredModules, featuredSkills } from "@/config/featured";
 
 function buildModulesDescription(): string {
   const modules = getAllModules();
@@ -35,10 +43,22 @@ export default function IntroductionPage() {
   const allModules = getAllModules();
   const allSkills = getAllSkills();
 
+  const featuredModuleList = featuredModules
+    .map((name) => allModules.find((m) => m.name === name))
+    .filter((m): m is NonNullable<typeof m> => m != null);
+
+  const featuredSkillList = featuredSkills
+    .map((name) => allSkills.find((s) => s.name === name))
+    .filter((s): s is NonNullable<typeof s> => s != null);
+
   return (
     <div className="flex flex-col container-main py-8 gap-6">
       <Breadcrumb>
         <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/">~</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbPage>Docs</BreadcrumbPage>
           </BreadcrumbItem>
@@ -59,8 +79,32 @@ export default function IntroductionPage() {
           exports — just pick what you need.
         </p>
 
+        {featuredSkillList.length > 0 && (
+          <>
+            <h2 className="text-xl font-semibold mt-10">Agent skills</h2>
+            <p>
+              Reusable instructions that extend AI coding agents with project-specific knowledge. Compatible with
+              OpenCode, Codex, Claude Code, and 50+ other agents.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+              {featuredSkillList.map((s) => (
+                <Card key={s.name} title={s.displayName} href={`/docs/skills/${s.name}`} size="sm">
+                  {s.description}
+                </Card>
+              ))}
+            </div>
+            <div className="mt-4 flex justify-start">
+              <Link
+                href="/docs/skills"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+                See all {allSkills.length} skills →
+              </Link>
+            </div>
+          </>
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-          {allModules.map((m) => (
+          {featuredModuleList.map((m) => (
             <Card
               key={m.name}
               title={m.displayName}
@@ -83,32 +127,13 @@ export default function IntroductionPage() {
             </Card>
           ))}
         </div>
-
-        {allSkills.length > 0 && (
-          <>
-            <h2 className="text-xl font-semibold mt-10">Agent skills</h2>
-            <p>
-              Reusable instructions that extend AI coding agents with project-specific knowledge. Compatible with
-              OpenCode, Codex, Claude Code, and 50+ other agents.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-              {allSkills.map((s) => (
-                <Card key={s.name} title={s.displayName} href={`/docs/skills/${s.name}`} size="sm">
-                  {s.description}
-                </Card>
-              ))}
-            </div>
-            <p className="text-sm text-muted-foreground mt-4">
-              See all skills on the{" "}
-              <Link
-                href="/docs/skills"
-                className="underline underline-offset-2 hover:text-foreground transition-colors">
-                Skills overview page
-              </Link>
-              .
-            </p>
-          </>
-        )}
+        <div className="mt-4 flex justify-start">
+          <Link
+            href="/docs/modules"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+            See all {allModules.length} modules →
+          </Link>
+        </div>
 
         <h2 className="text-xl font-semibold mt-10">Design principles</h2>
         <ul className="space-y-2 list-disc pl-5">

@@ -5,6 +5,8 @@ import type { ReactNode } from "react";
 import { UsageView } from "#/usage-view";
 import { OverflowCodeBlock } from "#/overflow-code-block";
 import { InstallDropdown } from "#/install-dropdown";
+import { ModuleInstallTabs } from "#/module-install-tabs";
+import { CodeCopyButton } from "#/copy-button";
 
 interface PageContentProps {
   /** Pre-highlighted source HTML for "Copy Source" view (using clean source) */
@@ -29,6 +31,8 @@ interface PageContentProps {
   examplesLocalHtml?: string;
   /** Optional children rendered in "Install Package" view before examples (e.g. submodule cards) */
   children?: ReactNode;
+  /** AI prompt string shown in the "Ask AI" view */
+  aiPrompt?: string;
 }
 
 export function PageContent({
@@ -43,6 +47,7 @@ export function PageContent({
   examplesHtml,
   examplesLocalHtml,
   children,
+  aiPrompt,
 }: PageContentProps) {
   const searchParams = useSearchParams();
   const view = searchParams.get("view") ?? "package";
@@ -53,7 +58,7 @@ export function PageContent({
       {view === "package" && (
         <div className="flex flex-col gap-6">
           <h2 className="text-xl font-semibold tracking-tight">Installation</h2>
-          <InstallDropdown module={sourceName} mode="install" />
+          <ModuleInstallTabs module={sourceName} />
           {children}
           <UsageView importHtml={importHtml} examplesHtml={examplesHtml} />
         </div>
@@ -81,6 +86,26 @@ export function PageContent({
             source={sourceCode}
             displayName={sourceName}
           />
+        </div>
+      )}
+
+      {/* "Ask AI" — copyable prompt for AI assistants */}
+      {view === "ask-ai" && aiPrompt && (
+        <div className="flex flex-col gap-6">
+          <h2 className="text-xl font-semibold tracking-tight">Ask AI</h2>
+          <div className="flex flex-col gap-3 rounded-lg border bg-card p-4">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs text-muted-foreground">Copy this prompt and paste it into any AI assistant.</p>
+              <CodeCopyButton
+                source={aiPrompt}
+                label="Copy prompt"
+                className="h-7 gap-1 px-2 rounded-md border border-border bg-background text-xs text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-2 shrink-0"
+              />
+            </div>
+            <pre className="text-xs text-muted-foreground font-mono whitespace-pre-wrap leading-relaxed select-all rounded-md bg-muted/40 p-3">
+              {aiPrompt}
+            </pre>
+          </div>
         </div>
       )}
     </>

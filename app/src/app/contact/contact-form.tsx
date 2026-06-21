@@ -23,7 +23,7 @@ const quickActions = [
     label: "Ask a question",
     desc: "Need help using a module?",
     href: "https://github.com/m10rten/typescript-bits/discussions",
-    color: "hover:border-ring/30 hover:bg-accent/50",
+    color: "hover:border-purple-500/30 hover:bg-purple-500/5",
   },
 ] as const;
 

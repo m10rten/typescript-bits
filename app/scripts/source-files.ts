@@ -97,10 +97,49 @@ function extractExports(source: string): ModuleExport[] {
 }
 
 function extractDescription(content: string, name: string): string {
-  const match = content.match(/\/\*\*\s*\n\s*\*\s*(.+?)\s*(?:\n|$)/);
-  if (match?.[1]) return match[1].trim();
-  const singleLine = content.match(/\/\*\*\s*(.+?)\s*\*\//);
-  if (singleLine?.[1]) return singleLine[1].trim();
+  // Find the first JSDoc block
+  const jsdocMatch = content.match(/\/\*\*([\s\S]*?)\*\//);
+  if (!jsdocMatch?.[1]) return descriptionFallback[name] ?? name;
+
+  // Strip the leading " * " prefix from each JSDoc line, drop the opening/closing delimiters
+  const rawLines = jsdocMatch[1].split("\n");
+  // Each line looks like: "   * content" or "   *"
+  const docLines = rawLines.map((l) => l.replace(/^\s*\*\s?/, ""));
+
+  // Stopping rule: empty line (blank or whitespace only) or a new tag
+  const isStop = (line: string) => line.trim() === "" || line.startsWith("@");
+
+  // Check for @summary tag
+  const summaryIdx = docLines.findIndex((l) => l.startsWith("@summary"));
+  if (summaryIdx !== -1) {
+    // First line: strip the "@summary " prefix, then collect continuation lines
+    const firstContent = docLines[summaryIdx]!.replace(/^@summary\s*/, "").trim();
+    const parts: string[] = firstContent ? [firstContent] : [];
+    for (let i = summaryIdx + 1; i < docLines.length; i++) {
+      const line = docLines[i]!;
+      if (isStop(line)) break;
+      parts.push(line.trim());
+    }
+    const result = parts.join(" ").trim();
+    if (result) return result;
+  }
+
+  // No @summary — use the first paragraph (content before first empty line or tag)
+  // Skip leading blank lines (the newline right after /**), then stop at the first blank or tag
+  const parts: string[] = [];
+  let started = false;
+  for (const line of docLines) {
+    const trimmed = line.trim();
+    if (!started) {
+      if (trimmed === "") continue; // skip leading blanks
+      started = true;
+    }
+    if (isStop(line)) break;
+    if (trimmed) parts.push(trimmed);
+  }
+  const result = parts.join(" ").trim();
+  if (result) return result;
+
   return descriptionFallback[name] ?? name;
 }
 
@@ -417,6 +456,7 @@ export interface SkillMeta {
   description: string;
   content: string;
   lineCount: number;
+  tokenCount: number;
 }
 
 function yamlField(body: string, key: string): string | undefined {
@@ -456,6 +496,7 @@ export function parseSkillFile(filePath: string): SkillMeta {
     description,
     content: body.trim(),
     lineCount: content.split("\n").length,
+    tokenCount: Math.round(body.trim().length / 4),
   };
 }
 

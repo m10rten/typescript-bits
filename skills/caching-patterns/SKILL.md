@@ -7,8 +7,6 @@ description: In-memory caching patterns for TypeScript — memoization, async de
 
 In-memory caching for TypeScript. These patterns apply in Node.js and browser environments without external stores.
 
-> **See also:** `memory-management-guidelines` for LRU/TTL class implementations and GC impact. `async-patterns` for retry/backoff when fetches fail.
-
 ---
 
 ## Synchronous Memoization
@@ -246,7 +244,7 @@ eventBus.on("user:updated", ({ id }: { id: string }) => {
 });
 ```
 
-Clean up event listeners on teardown — see `memory-management-guidelines`.
+Clean up event listeners on teardown.
 
 ### Versioned keys
 

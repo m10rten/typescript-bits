@@ -1,6 +1,10 @@
 /**
  * A discriminated union for explicit success-or-failure.
  *
+ * @summary Rust-inspired `Result<T, E>` type with `Ok` and `Err` variants that replaces throw/catch
+ * with explicit return types, making errors part of the function signature. Ships with `ok()`,
+ * `err()`, `isOk()`, `isErr()`, `unwrap()`, and `unwrapOr()` utilities for ergonomic handling.
+ *
  * @example
  * ```ts
  * import { Result } from "@typescript-bits/result";

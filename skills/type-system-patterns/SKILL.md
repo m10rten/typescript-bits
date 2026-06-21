@@ -5,7 +5,7 @@ description: Advanced TypeScript type system patterns — branded types, discrim
 
 # Type System Patterns
 
-Deep-end TypeScript. These patterns go beyond utility types and tsconfig — they cover how to model domain invariants, derive types, and make illegal states unrepresentable. See `typescript-best-practices` for utility types and compiler options.
+Deep-end TypeScript. These patterns go beyond utility types and tsconfig — they cover how to model domain invariants, derive types, and make illegal states unrepresentable.
 
 ## Branded / Nominal Types
 

@@ -12,12 +12,12 @@ export function CommandLine({ command, label, prefix = "$", className }: Command
   return (
     <div className={cn("flex items-center gap-3", className)}>
       {prefix && (
-        <span className="shrink-0 font-mono text-sm text-zinc-500 select-none" aria-hidden="true">
+        <span className="shrink-0 font-mono text-sm text-muted-foreground select-none" aria-hidden="true">
           {prefix}
         </span>
       )}
       <code
-        className="flex-1 min-w-0 font-mono text-sm text-zinc-100 select-all truncate"
+        className="flex-1 min-w-0 font-mono text-sm text-foreground select-all overflow-x-auto"
         style={{ fontVariantLigatures: "none" }}>
         {command}
       </code>
