@@ -16,7 +16,8 @@
         "memory-management-guidelines",
         "api-design-guidelines",
         "http-rest-guidelines",
-        "monorepo-guidelines"
+        "monorepo-guidelines",
+        "security-guidelines"
       ]
     },
     {

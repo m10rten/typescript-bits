@@ -26,19 +26,20 @@ auth-recipes                      # recipes category, auth domain
 
 ## Inventory
 
-| Skill                            | Category       | Domain                       |
-| -------------------------------- | -------------- | ---------------------------- |
-| `complexity-principles`          | principles     | Algorithmic complexity       |
-| `software-principles-guidelines` | principles     | General software engineering |
-| `memory-management-guidelines`   | guidelines     | Memory management            |
-| `typescript-best-practices`      | best-practices | TypeScript                   |
-| `nodejs-best-practices`          | best-practices | Node.js                      |
-| `zod-best-practices`             | best-practices | Zod                          |
-| `http-rest-guidelines`           | guidelines     | HTTP REST APIs               |
-| `async-patterns`                 | patterns       | Asynchronous programming     |
-| `composition-patterns`           | patterns       | Function/object composition  |
-| `react-best-practices`           | best-practices | React 19                     |
-| `nextjs-best-practices`          | best-practices | Next.js App Router           |
+| Skill                            | Category       | Domain                        |
+| -------------------------------- | -------------- | ----------------------------- |
+| `complexity-principles`          | principles     | Algorithmic complexity        |
+| `software-principles-guidelines` | principles     | General software engineering  |
+| `memory-management-guidelines`   | guidelines     | Memory management             |
+| `typescript-best-practices`      | best-practices | TypeScript                    |
+| `nodejs-best-practices`          | best-practices | Node.js                       |
+| `zod-best-practices`             | best-practices | Zod                           |
+| `http-rest-guidelines`           | guidelines     | HTTP REST APIs                |
+| `async-patterns`                 | patterns       | Asynchronous programming      |
+| `composition-patterns`           | patterns       | Function/object composition   |
+| `react-best-practices`           | best-practices | React 19                      |
+| `nextjs-best-practices`          | best-practices | Next.js App Router            |
+| `security-guidelines`            | guidelines     | Security (TypeScript/Node.js) |
 
 ## Registration
 
