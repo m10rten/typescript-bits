@@ -10,6 +10,9 @@ import { ThemeProvider } from "#/theme-provider";
 import { CookieBanner } from "#/cookie-banner";
 import { getSearchIndex } from "~/search-index";
 import { getAllModules } from "../../scripts/source-files";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
+
 import ExternalLink from "#/external-link";
 
 const geistSans = Geist({
@@ -74,28 +77,30 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning={true}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "typescript-bits",
+              url: siteUrl,
+              description: buildDescription(),
+              potentialAction: {
+                "@type": "SearchAction",
+                target: {
+                  "@type": "EntryPoint",
+                  urlTemplate: `${siteUrl}/?q={search_term_string}`,
+                },
+                "query-input": "required name=search_term_string",
+              },
+            }),
+          }}
+        />
+      </head>
       <body className="h-full flex flex-col overflow-hidden">
         <ThemeProvider>
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify({
-                "@context": "https://schema.org",
-                "@type": "WebSite",
-                name: "typescript-bits",
-                url: siteUrl,
-                description: buildDescription(),
-                potentialAction: {
-                  "@type": "SearchAction",
-                  target: {
-                    "@type": "EntryPoint",
-                    urlTemplate: `${siteUrl}/?q={search_term_string}`,
-                  },
-                  "query-input": "required name=search_term_string",
-                },
-              }),
-            }}
-          />
           <a
             href="#main-content"
             className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-background focus:text-foreground focus:rounded-md focus:outline-ring">
@@ -108,31 +113,43 @@ export default function RootLayout({
               className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden scrollbar-gutter-stable">
               <BreadcrumbNav />
               {children}
-              <footer className="border-t py-8 text-sm text-muted-foreground">
+              <footer className="border-t py-8 text-sm text-foreground/70">
                 <div className="container-main flex flex-col gap-2">
                   <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1">
                     <div className="flex items-center gap-3">
                       <span className="font-medium text-foreground">typescript-bits</span>
                       <span className="text-xs border rounded px-1.5 py-0.5">MIT</span>
                     </div>
-                    <nav className="flex flex-col items-end gap-1" aria-label="Footer">
+                    <nav className="flex flex-row flex-wrap items-center gap-x-6 gap-y-1" aria-label="Footer">
                       <ExternalLink
                         href="https://github.com/m10rten"
-                        className="underline underline-offset-2 hover:text-foreground transition-colors">
-                        m10rten ↗
+                        className="inline-flex items-center gap-1 text-foreground/70 hover:text-foreground underline-offset-4 hover:underline decoration-foreground/30 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring rounded-sm">
+                        m10rten
+                        <ArrowUpRight size={12} className="text-foreground/50" aria-hidden="true" />
                       </ExternalLink>
-                      <a href="/contact" title="Contact" className="hover:text-foreground transition-colors">
+                      <Link
+                        href="/blog"
+                        className="text-foreground/70 hover:text-foreground underline-offset-4 hover:underline decoration-foreground/30 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring rounded-sm">
+                        Blog
+                      </Link>
+                      <Link
+                        href="/release-notes"
+                        className="text-foreground/70 hover:text-foreground underline-offset-4 hover:underline decoration-foreground/30 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring rounded-sm">
+                        Release notes
+                      </Link>
+                      <Link
+                        href="/contact"
+                        className="text-foreground/70 hover:text-foreground underline-offset-4 hover:underline decoration-foreground/30 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring rounded-sm">
                         Contact
-                      </a>
-                      <a
+                      </Link>
+                      <Link
                         href="/terms-of-service"
-                        title="Terms of Service"
-                        className="hover:text-foreground transition-colors">
+                        className="text-foreground/70 hover:text-foreground underline-offset-4 hover:underline decoration-foreground/30 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring rounded-sm">
                         Terms of Service
-                      </a>
+                      </Link>
                     </nav>
                   </div>
-                  <p className="text-xs italic font-bold">&copy; {new Date().getFullYear()} typescript-bits</p>
+                  <p className="text-sm text-foreground/50">&copy; {new Date().getFullYear()} typescript-bits</p>
                 </div>
               </footer>
             </main>

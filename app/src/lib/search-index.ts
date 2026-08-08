@@ -1,8 +1,10 @@
-import { getAllModules, getAllSkills } from "../../scripts/source-files";
+import { getAllBlogs, getAllModules, getAllSkills } from "../../scripts/source-files";
 import { pageContent as getIntroductionContent } from "../app/docs/introduction/page";
 import { pageContent as installationContent } from "../app/docs/installation/page";
 import { pageContent as tosContent } from "../app/terms-of-service/page";
 import { pageContent as contactContent } from "../app/contact/page";
+import { pageContent as blogListContent } from "../app/blog/page";
+import { pageContent as releaseNotesContent } from "../app/release-notes/page";
 
 export interface SearchItemData {
   id: string;
@@ -10,13 +12,14 @@ export interface SearchItemData {
   description: string;
   content: string;
   url: string;
-  category: "Module" | "Submodule" | "Export" | "Page" | "Skill";
+  category: "Module" | "Submodule" | "Export" | "Page" | "Skill" | "Blog";
 }
 
 export function getSearchIndex(): SearchItemData[] {
   const items: SearchItemData[] = [];
   const modules = getAllModules();
   const skills = getAllSkills();
+  const blogs = getAllBlogs();
 
   for (const mod of modules) {
     items.push({
@@ -73,6 +76,18 @@ export function getSearchIndex(): SearchItemData[] {
     });
   }
 
+  // Blog entries
+  for (const blog of blogs) {
+    items.push({
+      id: `blog-${blog.name}`,
+      title: blog.title,
+      description: `Blog — ${blog.description}`,
+      content: blog.content,
+      url: `/blog/${blog.name}`,
+      category: "Blog",
+    });
+  }
+
   items.push(
     {
       id: "page-introduction",
@@ -104,6 +119,22 @@ export function getSearchIndex(): SearchItemData[] {
       description: "Pages — Get in touch with the typescript-bits team",
       content: contactContent,
       url: "/contact",
+      category: "Page",
+    },
+    {
+      id: "page-blog",
+      title: "Blog",
+      description: "Pages — Design decisions, migration notes, and practical patterns behind typescript-bits",
+      content: blogListContent(),
+      url: "/blog",
+      category: "Blog",
+    },
+    {
+      id: "page-release-notes",
+      title: "Release notes",
+      description: "Pages — Every release of typescript-bits, generated from changesets",
+      content: releaseNotesContent(),
+      url: "/release-notes",
       category: "Page",
     },
   );

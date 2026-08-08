@@ -21,6 +21,7 @@
     "build:packages": "pnpm -r --filter @typescript-bits/* build",
     "test": "pnpm tsx --test ./packages/**/tests/*.test.ts",
     "changeset": "changeset",
+    "version": "changeset version && tsx scripts/stamp-changelog-dates.ts",
     "release": "changeset publish"
   },
   "keywords": [
@@ -35,7 +36,14 @@
   "homepage": "https://ts.mvdlei.nl/",
   "repository": "https://github.com/m10rten/typescript-bits",
   "bugs": "https://github.com/m10rten/typescript-bits/issues",
-  "packageManager": "pnpm@11.1.2",
+  "packageManager": "pnpm@11.20.0",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "11.20.0",
+      "onFail": "download"
+    }
+  },
   "engines": {
     "node": "^24 || ^26"
   },

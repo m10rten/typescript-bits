@@ -84,7 +84,7 @@ export function Search({ items, questions }: SearchProps) {
 
     // Group by category, preserving order
     const groups: Record<string, SearchItemData[]> = {};
-    const order = ["Module", "Submodule", "Export", "Skill", "Page"] as const;
+    const order = ["Module", "Submodule", "Export", "Skill", "Blog", "Page"] as const;
 
     for (const { item } of scored) {
       (groups[item.category] ??= []).push(item);
@@ -101,7 +101,7 @@ export function Search({ items, questions }: SearchProps) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="group flex items-center gap-2 h-8 w-full max-w-xs rounded-lg border border-input bg-muted/30 px-3 text-sm text-muted-foreground hover:bg-muted/50 hover:text-foreground hover:border-ring/50 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50">
+        className="group flex items-center gap-2 h-8 w-full max-w-2xs md:min-w-64 md:max-w-md lg:min-w-80 lg:max-w-lg xl:min-w-96 rounded-lg border border-input bg-muted/30 px-3 text-sm text-muted-foreground hover:bg-muted/50 hover:text-foreground hover:border-ring/50 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50">
         <SearchIcon className="size-3.5 shrink-0 opacity-60 group-hover:opacity-100 transition-opacity" />
         <span className="truncate">{placeholder}</span>
         {isMac !== null && (

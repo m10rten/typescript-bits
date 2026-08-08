@@ -48,6 +48,10 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   images: { unoptimized: true },
+  // TypeScript 7 removed the programmatic compiler API that Next 16.2.x's build-time
+  // type check relies on. Type safety is enforced separately via the `tsc --noEmit`
+  // typecheck script.
+  typescript: { ignoreBuildErrors: true },
   async redirects() {
     return [
       {

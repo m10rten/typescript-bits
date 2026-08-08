@@ -22,7 +22,7 @@ export function MobileNav() {
         type="button"
         aria-label={open ? "Close menu" : "Open menu"}
         aria-expanded={open}
-        className="md:hidden flex items-center justify-center size-9 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+        className="xl:hidden flex items-center justify-center size-9 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
         onClick={() => setOpen((v) => !v)}>
         {open ? <X className="size-4" /> : <Menu className="size-4" />}
       </button>
@@ -35,7 +35,7 @@ export function MobileNav() {
             {/* Backdrop — z-[55] covers the sidebar button at z-50 */}
             {open && (
               <div
-                className="fixed inset-0 z-[55] bg-black/40 md:hidden"
+                className="fixed inset-0 z-[55] bg-black/40 xl:hidden"
                 onClick={() => setOpen(false)}
                 aria-hidden="true"
               />
@@ -44,7 +44,7 @@ export function MobileNav() {
             {/* Panel */}
             <aside
               className={cn(
-                "fixed inset-y-0 right-0 w-64 z-[60] bg-background border-l shadow-xl flex flex-col transition-transform duration-200 md:hidden",
+                "fixed inset-y-0 right-0 w-64 z-[60] bg-background border-l shadow-xl flex flex-col transition-transform duration-200 xl:hidden",
                 open ? "translate-x-0" : "translate-x-full",
               )}>
               <div className="flex items-center justify-between px-4 h-14 border-b">
@@ -80,8 +80,20 @@ export function MobileNav() {
                       className="block rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent/10 hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1">
                       Skills
                     </Link>
+                    <Link
+                      href="/docs/recipes"
+                      onClick={() => setOpen(false)}
+                      className="block rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent/10 hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1">
+                      Recipes
+                    </Link>
                   </CollapsibleContent>
                 </Collapsible>
+                <Link
+                  href="/blog"
+                  onClick={() => setOpen(false)}
+                  className="block rounded px-3 py-2 text-sm text-muted-foreground hover:bg-accent/10 hover:text-foreground transition-colors">
+                  Blog
+                </Link>
                 <Link
                   href="/contact"
                   onClick={() => setOpen(false)}

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "~/utils";
 import { useState } from "react";
 import { Menu, X, ChevronDownIcon, ChevronUpIcon } from "lucide-react";
-import type { ModuleMeta, SkillMeta } from "../../scripts/source-files";
+import type { ModuleMeta, SkillMeta, RecipeMeta } from "../../scripts/source-files";
 
 function CollapsibleHeader({
   label,
@@ -37,13 +37,22 @@ function CollapsibleHeader({
   );
 }
 
-export function DocsSidebar({ allModules, allSkills }: { allModules: ModuleMeta[]; allSkills: SkillMeta[] }) {
+export function DocsSidebar({
+  allModules,
+  allSkills,
+  allRecipes,
+}: {
+  allModules: ModuleMeta[];
+  allSkills: SkillMeta[];
+  allRecipes: RecipeMeta[];
+}) {
   const pathname = usePathname();
   const currentModule = pathname.startsWith("/docs/") ? pathname.replace("/docs/", "") : null;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [gettingStartedOpen, setGettingStartedOpen] = useState(true);
   const [modulesOpen, setModulesOpen] = useState(true);
   const [skillsOpen, setSkillsOpen] = useState(true);
+  const [recipesOpen, setRecipesOpen] = useState(true);
 
   return (
     <>
@@ -138,6 +147,41 @@ export function DocsSidebar({ allModules, allSkills }: { allModules: ModuleMeta[
                               : "text-muted-foreground hover:bg-muted hover:text-foreground",
                           )}>
                           {skill.name}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          )}
+
+          {/* Recipes */}
+          {allRecipes.length > 0 && (
+            <div>
+              <CollapsibleHeader
+                label="Recipes"
+                href="/docs/recipes"
+                isOpen={recipesOpen}
+                onToggle={() => setRecipesOpen((v) => !v)}
+              />
+              {recipesOpen && (
+                <ul className="space-y-1">
+                  {allRecipes.map((recipe) => {
+                    const recipeHref = `/docs/recipes/${recipe.name}`;
+                    const active = pathname === recipeHref;
+                    return (
+                      <li key={recipe.name}>
+                        <Link
+                          href={recipeHref}
+                          onClick={() => setMobileOpen(false)}
+                          className={cn(
+                            "block rounded px-2 py-1 text-sm transition-colors",
+                            active
+                              ? "bg-accent/10 font-medium text-accent"
+                              : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                          )}>
+                          {recipe.title}
                         </Link>
                       </li>
                     );

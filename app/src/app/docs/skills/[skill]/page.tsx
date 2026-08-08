@@ -9,7 +9,8 @@ import {
   BreadcrumbPage,
 } from "#/ui/breadcrumb";
 import { Badge } from "#/ui/badge";
-import { getSkillNames, getSkillContent, highlightCode } from "../../../../../scripts/source-files";
+import { getSkillNames, getSkillContent } from "../../../../../scripts/source-files";
+import { renderMarkdown } from "~/render-markdown";
 import { CodeBlock } from "#/code-block";
 import { ScrollProgress } from "#/scroll-progress";
 import { BackToTop } from "#/back-to-top";
@@ -42,204 +43,6 @@ export function generateStaticParams() {
   return getSkillNames().map((name) => ({ skill: name }));
 }
 
-function escapeHtml(str: string): string {
-  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
-let highlightCache = new Map<string, string>();
-
-async function awaitHighlightInner(code: string, lang: string): Promise<{ html: string; normalizedLang: string }> {
-  const key = `${lang}:${code.slice(0, 80)}`;
-  const cached = highlightCache.get(key);
-  if (cached) return { html: cached, normalizedLang: lang };
-
-  // Only ts and bash are supported by our highlighter
-  const normalizedLang = lang === "typescript" || lang === "json" || lang === "ts" ? "ts" : "bash";
-  try {
-    const highlighted = await highlightCode(code, normalizedLang as "ts" | "bash");
-    highlightCache.set(key, highlighted);
-    return { html: highlighted, normalizedLang };
-  } catch {
-    // Fallback to plain pre if highlighting fails
-    return {
-      html: `<pre class="rounded-lg border bg-zinc-900 p-4 overflow-x-auto text-sm">${escapeHtml(code)}</pre>`,
-      normalizedLang: lang,
-    };
-  }
-}
-
-/**
- * Applies all inline formatting transformations in order:
- * backtick code, __underline__ mono-italic, and **bold**.
- */
-function inlineFormat(text: string): string {
-  return text
-    .replace(/`([^`]+)`/g, '<code class="rounded bg-muted px-1 py-0.5 text-sm font-mono">`$1`</code>')
-    .replace(/__([^_]+)__/g, '<code class="rounded bg-muted px-1 py-0.5 text-sm font-mono italic">$1</code>')
-    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
-}
-
-/**
- * Structured content chunk from rendering skill markdown.
- */
-interface HtmlChunk {
-  type: "html";
-  html: string;
-}
-
-interface CodeChunk {
-  type: "code";
-  html: string;
-  code: string;
-  lang: string;
-}
-
-type ContentChunk = HtmlChunk | CodeChunk;
-
-/**
- * Processes the skill markdown content into structured chunks:
- * - Fenced code blocks are highlighted with Shiki and returned as CodeChunk
- * - Tables, headings, and paragraphs are rendered as HtmlChunk
- */
-async function renderSkillContent(content: string): Promise<ContentChunk[]> {
-  const lines = content.split("\n");
-  const chunks: ContentChunk[] = [];
-  let inCodeBlock = false;
-  let codeLang = "";
-  const codeLines: string[] = [];
-  const tableLines: string[] = [];
-
-  function flushTable() {
-    if (tableLines.length > 0) {
-      const parseRow = (line: string) =>
-        line
-          .split("|")
-          .map((c) => c.trim())
-          .filter((c) => c !== "");
-
-      // First row is the header (separator rows are already skipped during collection)
-      const [headerLine, ...bodyLines] = tableLines;
-      const headerCells = parseRow(headerLine!);
-      const bodyRows = bodyLines.map((row) => {
-        const cells = parseRow(row);
-        return `<tr>${cells
-          .map(
-            (c) =>
-              `<td class="px-4 py-2.5 text-sm text-muted-foreground border-t border-border">${inlineFormat(c)}</td>`,
-          )
-          .join("")}</tr>`;
-      });
-
-      chunks.push({
-        type: "html",
-        html: `<div class="overflow-x-auto my-4 rounded-lg border">
-<table class="w-full text-sm">
-<thead><tr>${headerCells
-          .map(
-            (c) =>
-              `<th class="px-4 py-2.5 text-xs font-semibold text-foreground uppercase tracking-wider text-left bg-muted/30 border-b border-border">${inlineFormat(c)}</th>`,
-          )
-          .join("")}</tr></thead>
-<tbody>${bodyRows.join("")}</tbody>
-</table>
-</div>`,
-      });
-      tableLines.length = 0;
-    }
-  }
-
-  for (const line of lines) {
-    if (line.trimStart().startsWith("```")) {
-      if (inCodeBlock) {
-        // Close code block
-        const code = codeLines.join("\n");
-        const result = await awaitHighlightInner(code, codeLang || "ts");
-        chunks.push({ type: "code", html: result.html, code, lang: result.normalizedLang });
-        codeLines.length = 0;
-        codeLang = "";
-        inCodeBlock = false;
-      } else {
-        flushTable();
-        inCodeBlock = true;
-        const trimmed = line.trimStart();
-        codeLang = trimmed.slice(3).trim();
-      }
-      continue;
-    }
-
-    if (inCodeBlock) {
-      codeLines.push(line);
-      continue;
-    }
-
-    if (line.trim() === "") {
-      flushTable();
-      chunks.push({ type: "html", html: '<div class="h-3"></div>' });
-      continue;
-    }
-
-    // Table row
-    if (line.trimStart().startsWith("|")) {
-      // Skip separator rows (| --- | --- |)
-      if (!/^\|[\s-:]+\|/.test(line.trim())) {
-        tableLines.push(line);
-      }
-      continue;
-    }
-
-    flushTable();
-
-    // Headings
-    const headingMatch = line.match(/^(#{1,3})\s+(.+)$/);
-    if (headingMatch) {
-      const level = headingMatch[1]!.length;
-      const text = inlineFormat(headingMatch[2]!);
-      const tag = `h${level + 1}`; // h2/h3/h4 since h1 is the page title
-      const sizes: Record<number, string> = {
-        1: "text-2xl font-bold mt-8",
-        2: "text-xl font-semibold mt-6",
-        3: "text-base font-semibold mt-4",
-      };
-      chunks.push({ type: "html", html: `<${tag} class="${sizes[level]}">${text}</${tag}>` });
-      continue;
-    }
-
-    // Blockquote
-    const blockquoteMatch = line.match(/^>\s+(.+)$/);
-    if (blockquoteMatch) {
-      chunks.push({
-        type: "html",
-        html: `<blockquote class="border-l-2 border-border pl-4 text-sm text-muted-foreground italic my-1">${inlineFormat(blockquoteMatch[1]!)}</blockquote>`,
-      });
-      continue;
-    }
-
-    // Unordered list
-    const listMatch = line.match(/^[-*]\s+(.+)$/);
-    if (listMatch) {
-      chunks.push({
-        type: "html",
-        html: `<li class="text-sm text-muted-foreground ml-4 list-disc">${inlineFormat(listMatch[1]!)}</li>`,
-      });
-      continue;
-    }
-
-    // Regular paragraph
-    chunks.push({ type: "html", html: `<p class="text-sm text-muted-foreground">${inlineFormat(line)}</p>` });
-  }
-
-  flushTable();
-
-  // If code block wasn't closed
-  if (inCodeBlock && codeLines.length > 0) {
-    const code = codeLines.join("\n");
-    const result = await awaitHighlightInner(code, codeLang || "ts");
-    chunks.push({ type: "code", html: result.html, code, lang: result.normalizedLang });
-  }
-
-  return chunks;
-}
-
 export default async function SkillPage({ params }: { params: Promise<{ skill: string }> }) {
   const { skill: skillName } = await params;
   let skill;
@@ -249,7 +52,7 @@ export default async function SkillPage({ params }: { params: Promise<{ skill: s
     notFound();
   }
 
-  const contentChunks = await renderSkillContent(skill.content);
+  const contentChunks = await renderMarkdown(skill.content);
 
   const aiPrompt = `Load the "${skill.displayName}" skill from typescript-bits into my AI coding agent.
 

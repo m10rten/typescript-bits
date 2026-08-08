@@ -185,7 +185,8 @@ const tsconfigContent = {
 writeFileSync(TSCONFIG_UMBRELLA, JSON.stringify(tsconfigContent, null, 2));
 
 try {
-  execSync(`npx tsc -p "${TSCONFIG_UMBRELLA}"`, { cwd: ROOT, stdio: "inherit" });
+  const tscBin = join(ROOT, "node_modules", ".bin", "tsc");
+  execSync(`"${tscBin}" -p "${TSCONFIG_UMBRELLA}"`, { cwd: ROOT, stdio: "inherit" });
 } finally {
   if (existsSync(TSCONFIG_UMBRELLA)) {
     rmSync(TSCONFIG_UMBRELLA);

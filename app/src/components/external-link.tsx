@@ -1,3 +1,5 @@
+"use client";
+
 import { forwardRef, type AnchorHTMLAttributes } from "react";
 
 export const ExternalLink = forwardRef<HTMLAnchorElement, AnchorHTMLAttributes<HTMLAnchorElement>>(
@@ -5,6 +7,8 @@ export const ExternalLink = forwardRef<HTMLAnchorElement, AnchorHTMLAttributes<H
     return (
       <a ref={ref} target="_blank" rel="noopener noreferrer" {...props}>
         {children}
+        {/* Communicate new-tab behavior to screen readers */}
+        <span className="sr-only">(opens in new tab)</span>
       </a>
     );
   },

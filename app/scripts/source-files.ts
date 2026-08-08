@@ -529,6 +529,253 @@ export function getAllSkills(): SkillMeta[] {
   return getSkillNames().map(getSkillContent);
 }
 
+// ── Recipe discovery ─────────────────────────────────────────────────────────
+
+const RECIPES_DIR = join(/*turbopackIgnore: true*/ process.cwd(), "..", "recipes");
+
+export interface RecipeMeta {
+  name: string;
+  title: string;
+  description: string;
+  tags: string[];
+  content: string;
+  lineCount: number;
+  tokenCount: number;
+}
+
+/**
+ * Parses a YAML array field from a frontmatter block.
+ * Handles both inline flow (`tags: [a, b, c]`) and block (`- a`) forms.
+ * Returns `[]` when the field is absent.
+ */
+export function yamlList(body: string, key: string): string[] {
+  // Inline flow: tags: [react, zod, typescript]
+  const inlineRegex = new RegExp(`^${key}:\\s*\\[([^\\]]*)\\]`, "m");
+  const inlineMatch = inlineRegex.exec(body);
+  if (inlineMatch?.[1]) {
+    return inlineMatch[1]
+      .split(",")
+      .map((s) => s.trim().replace(/^["']|["']$/g, ""))
+      .filter((s) => s.length > 0);
+  }
+
+  // Block form: find the key, then collect `- value` lines that immediately follow
+  const keyRegex = new RegExp(`^${key}:\\s*$`, "m");
+  const keyMatch = keyRegex.exec(body);
+  if (keyMatch !== null) {
+    const afterKey = body.slice(keyMatch.index + keyMatch[0].length);
+    const items: string[] = [];
+    for (const line of afterKey.split("\n")) {
+      const itemMatch = /^\s*-\s+(.+)$/.exec(line);
+      if (itemMatch?.[1]) {
+        items.push(itemMatch[1].trim().replace(/^["']|["']$/g, ""));
+      } else if (line.trim() !== "") {
+        // Non-empty, non-list line ends the block
+        break;
+      }
+    }
+    return items;
+  }
+
+  return [];
+}
+
+/**
+ * Parses a flat recipe `.md` file (with YAML frontmatter) into RecipeMeta.
+ * Frontmatter must be delimited by `---` on its own line at start and end.
+ */
+export function parseRecipeFile(filePath: string): RecipeMeta {
+  const content = readFileSync(filePath, "utf-8");
+
+  if (!content.startsWith("---")) {
+    throw new Error(`Recipe file ${filePath} is missing YAML frontmatter`);
+  }
+
+  const afterFirst = content.slice(3);
+  const endMatch = afterFirst.match(/^---[\r\n]/m);
+  if (!endMatch || endMatch.index === undefined) {
+    throw new Error(`Recipe file ${filePath} has unclosed YAML frontmatter`);
+  }
+
+  const fmRaw = afterFirst.slice(0, endMatch.index);
+  const body = afterFirst.slice(endMatch.index + endMatch[0].length);
+
+  const name = yamlField(fmRaw, "name") ?? "";
+  const title = yamlField(fmRaw, "title") ?? "";
+  const description = yamlField(fmRaw, "description") ?? "";
+  const tags = yamlList(fmRaw, "tags");
+
+  return {
+    name,
+    title: title || name.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+    description,
+    tags,
+    content: body.trim(),
+    lineCount: content.split("\n").length,
+    tokenCount: Math.round(body.trim().length / 4),
+  };
+}
+
+export function getRecipeNames(): string[] {
+  const names: string[] = [];
+  try {
+    const entries = readdirSync(RECIPES_DIR, { withFileTypes: true });
+    for (const entry of entries) {
+      if (entry.isFile() && entry.name.endsWith(".md")) {
+        names.push(entry.name.replace(/\.md$/, ""));
+      }
+    }
+  } catch {
+    // recipes/ directory doesn't exist
+  }
+  return names.sort();
+}
+
+export function getRecipeContent(recipeName: string): RecipeMeta {
+  const filePath = join(RECIPES_DIR, `${recipeName}.md`);
+  return parseRecipeFile(filePath);
+}
+
+export function getAllRecipes(): RecipeMeta[] {
+  return getRecipeNames().map(getRecipeContent);
+}
+
+// ── Blog discovery ───────────────────────────────────────────────────────────
+
+const BLOGS_DIR = join(/*turbopackIgnore: true*/ process.cwd(), "..", "blogs");
+
+export interface BlogMeta {
+  name: string;
+  title: string;
+  /** ISO date string */
+  date: string;
+  tags: string[];
+  description: string;
+  /** Explicit related-post slugs, in priority order; overrides tag-based ranking when present */
+  related?: string[];
+  content: string;
+  lineCount: number;
+  tokenCount: number;
+}
+
+/**
+ * Parses a blog post `<slug>/index.md` file (with YAML frontmatter) into BlogMeta.
+ * Frontmatter must be delimited by `---` on its own line at start and end.
+ * The directory name is the canonical slug; a mismatched `name` field is ignored (with a warning).
+ */
+export function parseBlogFile(filePath: string, dirName: string): BlogMeta {
+  const content = readFileSync(filePath, "utf-8");
+
+  if (!content.startsWith("---")) {
+    throw new Error(`Blog file ${filePath} is missing YAML frontmatter`);
+  }
+
+  const afterFirst = content.slice(3);
+  const endMatch = afterFirst.match(/^---[\r\n]/m);
+  if (!endMatch || endMatch.index === undefined) {
+    throw new Error(`Blog file ${filePath} has unclosed YAML frontmatter`);
+  }
+
+  const fmRaw = afterFirst.slice(0, endMatch.index);
+  const body = afterFirst.slice(endMatch.index + endMatch[0].length);
+
+  const frontmatterName = yamlField(fmRaw, "name");
+  if (frontmatterName && frontmatterName !== dirName) {
+    console.warn(
+      `Blog frontmatter name "${frontmatterName}" in ${filePath} does not match directory "${dirName}"; using directory name`,
+    );
+  }
+
+  const title = yamlField(fmRaw, "title") ?? "";
+  const date = yamlField(fmRaw, "date") ?? "";
+  const description = yamlField(fmRaw, "description") ?? "";
+  const tags = yamlList(fmRaw, "tags");
+  const related = yamlList(fmRaw, "related");
+
+  return {
+    name: dirName,
+    title: title || dirName.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+    date,
+    tags,
+    description,
+    related: related.length > 0 ? related : undefined,
+    content: body.trim(),
+    lineCount: content.split("\n").length,
+    tokenCount: Math.round(body.trim().length / 4),
+  };
+}
+
+export function getBlogNames(): string[] {
+  const names: string[] = [];
+  try {
+    const entries = readdirSync(BLOGS_DIR, { withFileTypes: true });
+    for (const entry of entries) {
+      if (entry.isDirectory()) {
+        const indexFile = join(BLOGS_DIR, entry.name, "index.md");
+        try {
+          if (readFileSync(indexFile, "utf-8")) names.push(entry.name);
+        } catch {
+          // no index.md — not a blog post
+        }
+      }
+    }
+  } catch {
+    // blogs/ directory doesn't exist
+  }
+  return names.sort();
+}
+
+export function getBlogContent(slug: string): BlogMeta {
+  const filePath = join(BLOGS_DIR, slug, "index.md");
+  return parseBlogFile(filePath, slug);
+}
+
+/** Returns all blog posts sorted newest-first by `date` (stable tie-break by slug). */
+export function getAllBlogs(): BlogMeta[] {
+  const blogs = getBlogNames().map(getBlogContent);
+  blogs.sort((a, b) => {
+    const dateDiff = new Date(b.date).getTime() - new Date(a.date).getTime();
+    if (dateDiff !== 0) return dateDiff;
+    return a.name.localeCompare(b.name);
+  });
+  return blogs;
+}
+
+/**
+ * Returns related posts for a given slug, capped at `limit`.
+ * If the post declares `related[]`, resolves those slugs (existing posts only, order preserved).
+ * Otherwise ranks other posts by shared-tag count descending, tie-breaking by date descending.
+ */
+export function getRelatedBlogs(slug: string, limit = 3): BlogMeta[] {
+  const allBlogs = getAllBlogs();
+  const post = allBlogs.find((b) => b.name === slug);
+  if (!post) return [];
+
+  const others = allBlogs.filter((b) => b.name !== slug);
+
+  if (post.related && post.related.length > 0) {
+    const byName = new Map(others.map((b) => [b.name, b]));
+    const resolved: BlogMeta[] = [];
+    for (const relatedSlug of post.related) {
+      const match = byName.get(relatedSlug);
+      if (match) resolved.push(match);
+      if (resolved.length >= limit) break;
+    }
+    return resolved;
+  }
+
+  const postTags = new Set(post.tags);
+  return others
+    .map((blog) => ({ blog, shared: blog.tags.filter((tag) => postTags.has(tag)).length }))
+    .filter((entry) => entry.shared > 0)
+    .sort((a, b) => {
+      if (b.shared !== a.shared) return b.shared - a.shared;
+      return new Date(b.blog.date).getTime() - new Date(a.blog.date).getTime();
+    })
+    .slice(0, limit)
+    .map((entry) => entry.blog);
+}
+
 const KNOWN_IMPORTS: Record<string, string> = {
   atom: 'import { atom, type Atom } from "typescript-bits/atom";',
   result: 'import { Result } from "typescript-bits/result";',
@@ -564,4 +811,107 @@ export function getLocalImportCode(modulePath: string): string {
   }
   // Replace "typescript-bits/..." with "../lib/bits/..."
   return pkgImport.replace(/"typescript-bits(\/[^"]*)?"/, `"../lib/bits/${modulePath}"`);
+}
+
+// ── Release notes ─────────────────────────────────────────────────────────────
+
+const ROOT_DIR = join(/*turbopackIgnore: true*/ process.cwd(), "..");
+const CHANGELOG_PATH = join(ROOT_DIR, "CHANGELOG.md");
+
+export type BumpType = "major" | "minor" | "patch";
+
+export interface ReleaseEntry {
+  hash: string | null;
+  description: string;
+}
+
+export interface ReleaseGroup {
+  type: BumpType;
+  label: string;
+  entries: ReleaseEntry[];
+}
+
+export interface ReleaseMeta {
+  version: string;
+  date: string | null;
+  bump: BumpType;
+  groups: ReleaseGroup[];
+}
+
+const BUMP_RANK: Record<BumpType, number> = { patch: 0, minor: 1, major: 2 };
+
+function parseGroupType(label: string): BumpType | null {
+  const lower = label.toLowerCase();
+  if (lower.startsWith("major")) return "major";
+  if (lower.startsWith("minor")) return "minor";
+  if (lower.startsWith("patch")) return "patch";
+  return null;
+}
+
+function parseEntry(text: string): ReleaseEntry {
+  const match = /^([0-9a-f]{7}):\s*(.*)$/.exec(text);
+  if (!match) return { hash: null, description: text };
+  return { hash: match[1]!, description: match[2]! };
+}
+
+function highestBump(groups: ReleaseGroup[]): BumpType {
+  let bump: BumpType = "patch";
+  for (const group of groups) {
+    if (BUMP_RANK[group.type] > BUMP_RANK[bump]) bump = group.type;
+  }
+  return bump;
+}
+
+/** Parses a changesets-generated `CHANGELOG.md` string into `ReleaseMeta[]` (file order, newest first). */
+export function parseChangelog(content: string): ReleaseMeta[] {
+  const releases: ReleaseMeta[] = [];
+  let currentGroup: ReleaseGroup | null = null;
+
+  for (const line of content.split("\n")) {
+    const releaseMatch = /^##(?!#)\s+(\S+)(?:\s+-\s+(\d{4}-\d{2}-\d{2}))?\s*$/.exec(line);
+    if (releaseMatch) {
+      releases.push({ version: releaseMatch[1]!, date: releaseMatch[2] ?? null, bump: "patch", groups: [] });
+      currentGroup = null;
+      continue;
+    }
+
+    const groupMatch = /^###(?!#)\s+(.+)$/.exec(line);
+    const currentRelease = releases[releases.length - 1];
+    if (groupMatch && currentRelease) {
+      const label = groupMatch[1]!.trim();
+      // Unrecognized headings still get rendered; "patch" is the lowest-severity
+      // default so a fallback group can never inflate a release's computed bump.
+      const type = parseGroupType(label) ?? "patch";
+      currentGroup = { type, label, entries: [] };
+      currentRelease.groups.push(currentGroup);
+      continue;
+    }
+
+    const entryMatch = /^\s*-\s+(.+)$/.exec(line);
+    if (entryMatch && currentGroup) {
+      currentGroup.entries.push(parseEntry(entryMatch[1]!.trim()));
+      continue;
+    }
+
+    if (currentGroup && line.trim() !== "" && currentGroup.entries.length > 0) {
+      const last = currentGroup.entries[currentGroup.entries.length - 1]!;
+      last.description += ` ${line.trim()}`;
+    }
+  }
+
+  for (const release of releases) {
+    release.bump = highestBump(release.groups);
+  }
+
+  return releases;
+}
+
+/** Returns all releases parsed from the root `CHANGELOG.md`, in file order (newest first). */
+export function getAllReleases(): ReleaseMeta[] {
+  try {
+    const content = readFileSync(CHANGELOG_PATH, "utf-8");
+    return parseChangelog(content);
+  } catch {
+    return [];
+  }
 }

@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getAllModules, getAllSkills } from "../../scripts/source-files";
+import { getAllBlogs, getAllModules, getAllSkills } from "../../scripts/source-files";
 
 const SITE_URL = process.env.SITE_URL ?? "https://ts.mvdlei.nl";
 
@@ -9,6 +9,8 @@ const staticRoutes: MetadataRoute.Sitemap = [
   { url: `${SITE_URL}/docs/installation`, changeFrequency: "monthly", priority: 0.8 },
   { url: `${SITE_URL}/terms-of-service`, changeFrequency: "yearly", priority: 0.3 },
   { url: `${SITE_URL}/contact`, changeFrequency: "monthly", priority: 0.5 },
+  { url: `${SITE_URL}/blog`, changeFrequency: "weekly", priority: 0.6 },
+  { url: `${SITE_URL}/release-notes`, changeFrequency: "weekly", priority: 0.6 },
 ];
 
 const metadataRoutes: MetadataRoute.Sitemap = [
@@ -20,6 +22,7 @@ const metadataRoutes: MetadataRoute.Sitemap = [
 export default function sitemap(): MetadataRoute.Sitemap {
   const modules = getAllModules();
   const skills = getAllSkills();
+  const blogs = getAllBlogs();
 
   const moduleRoutes: MetadataRoute.Sitemap = modules.flatMap((mod) => {
     const routes: MetadataRoute.Sitemap = [
@@ -45,5 +48,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.5,
   }));
 
-  return [...staticRoutes, ...moduleRoutes, ...skillRoutes, ...metadataRoutes];
+  const blogRoutes: MetadataRoute.Sitemap = blogs.map((blog) => ({
+    url: `${SITE_URL}/blog/${blog.name}`,
+    changeFrequency: "monthly",
+    priority: 0.5,
+  }));
+
+  return [...staticRoutes, ...moduleRoutes, ...skillRoutes, ...blogRoutes, ...metadataRoutes];
 }

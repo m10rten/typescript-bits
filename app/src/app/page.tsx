@@ -1,20 +1,19 @@
 import Link from "next/link";
 import { Button } from "#/ui/button";
 import { Badge } from "#/ui/badge";
-import { GitBranch } from "lucide-react";
-import { getAllModules, getAllSkills } from "../../scripts/source-files";
+import { ArrowRight, GitBranch } from "lucide-react";
+import { getAllBlogs, getAllModules, getAllSkills } from "../../scripts/source-files";
 import { InstallHero } from "#/install-hero";
 import { Card } from "#/card";
 import { ExternalLink } from "#/external-link";
 import { featuredModules, featuredSkills } from "@/config/featured";
-
-function buildHeroDescription(): string {
-  return `Production-grade TypeScript primitives and AI agent skills — zero-dependency, tree-shakeable, fully typed, and rigorously tested.`;
-}
+import { Hero } from "#/hero";
 
 export default function Home() {
   const allModules = getAllModules();
   const allSkills = getAllSkills();
+  const allBlogs = getAllBlogs();
+  const latestBlogs = allBlogs.slice(0, 3);
 
   const featuredModuleList = featuredModules
     .map((name) => allModules.find((m) => m.name === name))
@@ -26,46 +25,43 @@ export default function Home() {
 
   return (
     <div className="flex flex-col flex-1">
-      <section aria-labelledby="hero-title" className="hero-bg relative overflow-hidden">
-        {/* Masked line grid texture */}
-        <div
-          className="pointer-events-none absolute inset-0"
-          aria-hidden="true"
-          style={{
-            backgroundImage: [
-              "linear-gradient(to right, oklch(0 0 0 / 0.045) 1px, transparent 1px)",
-              "linear-gradient(to bottom, oklch(0 0 0 / 0.045) 1px, transparent 1px)",
-            ].join(", "),
-            backgroundSize: "32px 32px",
-            maskImage: "radial-gradient(ellipse 80% 65% at 30% 0%, black, transparent 80%)",
-            WebkitMaskImage: "radial-gradient(ellipse 80% 65% at 30% 0%, black, transparent 80%)",
-          }}
-        />
+      <Hero intensity="default">
+        <div className="flex flex-col items-start gap-4 max-w-3xl">
+          {/* Wordmark demoted to eyebrow/kicker label */}
+          <span className="text-xs font-mono font-medium tracking-widest text-muted-foreground uppercase">
+            typescript-bits
+          </span>
 
-        <div className="container-main py-16 md:py-24">
-          <div className="flex flex-col items-start gap-4 max-w-3xl">
-            <h1 id="hero-title" className="text-4xl md:text-5xl font-bold tracking-tight text-balance">
-              typescript-bits
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl text-balance">{buildHeroDescription()}</p>
-            <div className="flex flex-wrap gap-3 mt-2">
-              <Button nativeButton={false} render={<Link href="/docs" />}>
-                Browse Docs &rarr;
-              </Button>
-              <Button
-                nativeButton={false}
-                variant="outline"
-                render={<ExternalLink href="https://github.com/m10rten/typescript-bits" />}>
-                <GitBranch className="size-4" /> GitHub
-              </Button>
-            </div>
+          {/* H1 — value proposition promoted from the former subhead */}
+          <h1 id="hero-title" className="text-4xl md:text-5xl font-bold tracking-tight text-balance">
+            <span className="text-accent-strong">Production-grade</span>&nbsp;TypeScript primitives &amp; agent skills
+          </h1>
 
-            <div className="mt-6 w-full max-w-lg">
-              <InstallHero />
-            </div>
+          {/* Subhead — foreground/80 for AA contrast over the gradient region */}
+          <p className="text-lg md:text-xl text-foreground/80 max-w-2xl text-balance">
+            Zero-dependency, tree-shakeable, fully typed, and rigorously tested — install once, use everywhere.
+          </p>
+
+          <div className="flex flex-wrap gap-3 mt-2">
+            <Button nativeButton={false} render={<Link href="/docs" />}>
+              Browse Docs
+              {/* Icon carries the directional affordance; aria-hidden so SR skips it */}
+              <ArrowRight className="size-4" aria-hidden="true" />
+            </Button>
+            <Button
+              nativeButton={false}
+              variant="outline"
+              render={<ExternalLink href="https://github.com/m10rten/typescript-bits" />}>
+              <GitBranch className="size-4" aria-hidden="true" /> View on GitHub
+            </Button>
+          </div>
+
+          {/* Install command — co-primary weight, directly under CTAs */}
+          <div className="mt-4 w-full max-w-lg">
+            <InstallHero />
           </div>
         </div>
-      </section>
+      </Hero>
 
       <section aria-labelledby="skills-title" className="container-main py-12 md:py-16">
         <h2 id="skills-title" className="text-2xl font-semibold mb-6">
@@ -86,7 +82,8 @@ export default function Home() {
           <Link
             href="/docs/skills"
             className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
-            See all {allSkills.length} skills →
+            See all {allSkills.length} skills
+            <ArrowRight className="size-3.5" aria-hidden="true" />
           </Link>
         </div>
       </section>
@@ -124,9 +121,37 @@ export default function Home() {
           <Link
             href="/docs/modules"
             className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
-            See all {allModules.length} modules →
+            See all {allModules.length} modules
+            <ArrowRight className="size-3.5" aria-hidden="true" />
           </Link>
         </div>
+      </section>
+
+      <section aria-labelledby="blog-title" className="container-main pb-12 md:pb-16">
+        <h2 id="blog-title" className="text-2xl font-semibold mb-6">
+          Blog
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {latestBlogs.map((post) => (
+            <Card
+              key={post.name}
+              title={post.title}
+              description={post.description}
+              href={`/blog/${post.name}`}
+              size="sm"
+            />
+          ))}
+        </div>
+        {allBlogs.length > 0 && (
+          <div className="mt-4 flex justify-start">
+            <Link
+              href="/blog"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+              See all {allBlogs.length} posts
+              <ArrowRight className="size-3.5" aria-hidden="true" />
+            </Link>
+          </div>
+        )}
       </section>
     </div>
   );
